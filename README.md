@@ -1,3 +1,10 @@
+
+
+### Running
+Set the REACT_APP_VERSION environment variable to the current version
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>

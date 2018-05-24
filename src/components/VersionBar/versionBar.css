@@ -1,0 +1,11 @@
+.versionBar {
+    position: fixed;
+    height: 16px;
+    width: calc(100%);
+    text-align: center;
+    background: rgb(88, 175, 88);
+}
+
+.version {
+    color: white;
+}

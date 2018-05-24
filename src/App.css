@@ -2,7 +2,7 @@
   width: calc(65%);
   height: calc(100%);
   left: 0px;
-  top: 0px;
+  top: 16px;
   background-color: palevioletred;
   position: absolute;
 }
@@ -13,7 +13,7 @@
   width: calc(35%);
   height: calc(100%);
   left: calc(65%);
-  top: 0px;
+  top: 16px;
   background-color: white;
   overflow: scroll;
 }

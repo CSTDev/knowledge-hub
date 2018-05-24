@@ -7,8 +7,9 @@ import {SearchBar} from './components/SearchBar';
 import {DetailsPane} from  './components/DetailsPane';
 import {Reports} from './data/Reports';
 import {FilterData} from './data/Filter';
-import {ReportDialog} from "./components/ReportDialog/index";
+import {ReportDialog} from "./components/ReportDialog/reportDialog";
 import {MapView} from './components/Map/map';
+import {VersionBar} from './components/VersionBar/versionBar';
 import * as _ from 'lodash';
 
 
@@ -21,7 +22,8 @@ class App extends Component {
       filterText: "",
       reports: Reports,
       filteredReports: Reports,
-      selectedReport: null
+      selectedReport: null,
+      version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1"
     };
   }
 
@@ -67,6 +69,7 @@ class App extends Component {
   render() {
     return (
       <div>
+        <VersionBar version={this.state.version}/>
         <div className="mapArea">
           <div className="searchArea" style={{display: this.state.selectedReport ? "none" : "block"}}>
             <SearchBar value={this.state.filterText} onChange={(value, event) => this.filterChange(value, event)}/>

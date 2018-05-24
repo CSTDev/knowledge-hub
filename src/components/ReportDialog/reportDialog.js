@@ -3,6 +3,8 @@ import {DialogContainer, Toolbar, Button, Grid, Cell, Paper, TextField} from 're
 import {formatLatitude, formatLongitude} from 'latlon-formatter';
 import * as _ from 'lodash';
 
+import './reportDialog.css'
+
 export class ReportDialog extends React.Component {
   constructor(props) {
     super(props);
@@ -57,7 +59,7 @@ export class ReportDialog extends React.Component {
 
       return <DialogContainer visible={this.props.report !== null}
                               id="reportDialog"
-                              fullPage
+                              className="reportDialog"
                               onHide={this.props.onHide}
                               onShow={() => this.onShow(this.props.report)}>
         <Toolbar fixed

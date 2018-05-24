@@ -33,7 +33,6 @@ export class MapView extends React.Component {
   }
 
   render() {
-    console.dir(this.props)
     const position = [this.state.lat, this.state.lng]
 
     return (

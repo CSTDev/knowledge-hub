@@ -2,6 +2,8 @@ import React from 'react'
 import {Avatar, Paper, List, ListItem, Subheader} from 'react-md';
 import {formatLatitude, formatLongitude} from 'latlon-formatter';
 
+const uuidv4 = require('uuid/v4');
+
 export class DetailsPane extends React.Component {
   constructor(props) {
     super(props)
@@ -14,6 +16,7 @@ export class DetailsPane extends React.Component {
 
       return <ListItem primaryText={report.title}
                        secondaryText={`${lat} ${lon}`}
+                       key={uuidv4()}
                        leftAvatar={<Avatar suffix="deep-purple">{report.reports.length}</Avatar>}
                        onClick={() => showReport(report)}/>;
     });
