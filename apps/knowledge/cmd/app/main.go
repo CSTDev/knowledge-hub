@@ -14,8 +14,7 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 }
 
 func main() {
-	db := "mongo:\\\\"
-	var service = &knowledge.WebService{DB: &db}
+	var service = &knowledge.WebService{}
 
 	router := knowledge.NewRouter(service)
 
