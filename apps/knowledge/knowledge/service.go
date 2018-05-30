@@ -6,6 +6,7 @@ import (
 
 	"github.com/cstdev/knowledge-hub/apps/knowledge/database"
 	"github.com/cstdev/knowledge-hub/apps/knowledge/types"
+	"github.com/dyninc/qstring"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -76,7 +77,73 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 			}).Error("Failed to create new record")
 		}
 
+		log.Info("Successfully created new record")
 		w.WriteHeader(http.StatusCreated)
 
 	}
+}
+
+// Search queries the database for the term passed to the path
+// as a URL query parameter
+func (s *WebService) Search() http.HandlerFunc {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.WithFields(log.Fields{
+		"event": "search",
+	})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Debug("Called Search")
+		query := &types.SearchQuery{}
+		log.Debug(r.URL.Query())
+
+		if len(r.URL.Query()) < 1 {
+			log.WithFields(log.Fields{
+				"status": 400,
+			}).Error("No query parameters provided")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "No search parameters provided"})
+			return
+		}
+
+		err := qstring.Unmarshal(r.URL.Query(), query)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"status": 400,
+				"error":  err.Error(),
+			}).Error("Unable to unmarshal query params")
+
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to parse search parameters"})
+			return
+		}
+
+		if len(query.Query) > 100 {
+			log.WithFields(log.Fields{
+				"status": 400,
+			}).Error("Query string too long")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Query string must be less than 100 characters"})
+			return
+		}
+
+		records, err := s.DB.Search(*query)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":  err,
+				"status": 500,
+				"query":  query,
+			}).Error("Unable to search database")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to search database"})
+			return
+		}
+
+		log.WithFields(log.Fields{
+			"status":   200,
+			"response": records,
+		}).Info("Results returned")
+		json.NewEncoder(w).Encode(records)
+	}
+
 }

@@ -33,6 +33,11 @@ func initRoutes(service types.Service) {
 			"POST",
 			"/record",
 			service.NewRecord(),
+		}, Route{
+			"SearchRecord",
+			"GET",
+			"/record",
+			service.Search(),
 		},
 	}
 }

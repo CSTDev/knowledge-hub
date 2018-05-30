@@ -2,11 +2,14 @@ package knowledge
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/cstdev/knowledge-hub/apps/knowledge/types"
@@ -22,11 +25,22 @@ func ok(tb testing.TB, err error) {
 }
 
 type mockDB struct {
+	SearchQuery types.SearchQuery
+	CreateFunc  func(r types.Record) error
+	SearchFunc  func(query types.SearchQuery) ([]types.Record, error)
 }
 
 func (db *mockDB) Create(r types.Record) error {
-	called = true
-	return nil
+	// called = true
+	// return nil
+	return db.CreateFunc(r)
+}
+
+func (db *mockDB) Search(query types.SearchQuery) ([]types.Record, error) {
+	// db.SearchQuery = query
+	// fmt.Println(query.Query)
+	// return nil
+	return db.SearchFunc(query)
 }
 
 var called bool
@@ -53,7 +67,12 @@ var jsonReq = []byte(`{
 
 func TestNewRecordCallsDatabaseWithRecord(t *testing.T) {
 	called = false
-	db := mockDB{}
+	db := mockDB{
+		CreateFunc: func(r types.Record) error {
+			called = true
+			return nil
+		},
+	}
 	service := &WebService{DB: &db}
 
 	req, err := http.NewRequest("POST", "/record", bytes.NewBuffer(jsonReq))
@@ -114,7 +133,11 @@ func TestReturnsServerErrorWhenNoDB(t *testing.T) {
 }
 
 func TestReturnsCreatedStatusOnSuccess(t *testing.T) {
-	db := mockDB{}
+	db := mockDB{
+		CreateFunc: func(r types.Record) error {
+			return nil
+		},
+	}
 	service := &WebService{DB: &db}
 	req, err := http.NewRequest("POST", "/record", bytes.NewBuffer(jsonReq))
 	ok(t, err)
@@ -125,4 +148,102 @@ func TestReturnsCreatedStatusOnSuccess(t *testing.T) {
 	if rr.Code != http.StatusCreated {
 		t.Errorf("Expected Created (201) status to be returned got %d", rr.Code)
 	}
+}
+
+func TestSearchWithNoQueryParamsErrors(t *testing.T) {
+	db := mockDB{}
+	service := &WebService{DB: &db}
+	req, err := http.NewRequest("GET", "/record", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestSearchQueryTooLong(t *testing.T) {
+	db := mockDB{}
+	service := &WebService{DB: &db}
+	req, err := http.NewRequest("GET", "/record?query=A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestSearchQueryIsPassedToDB(t *testing.T) {
+	var passedQuery string
+	db := mockDB{
+		SearchFunc: func(s types.SearchQuery) ([]types.Record, error) {
+			passedQuery = s.Query
+			return []types.Record{}, nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	expectedQuery := "Leeds"
+
+	req, err := http.NewRequest("GET", "/record?query=Leeds", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if passedQuery != expectedQuery {
+		t.Error("Expected search passed to DB but it wasn't")
+	}
+}
+
+func TestSearchReturnsServerErrorWhenDBSearchFails(t *testing.T) {
+	db := mockDB{
+		SearchFunc: func(query types.SearchQuery) ([]types.Record, error) {
+			return []types.Record{}, errors.New("Unable to search")
+		},
+	}
+	service := &WebService{DB: &db}
+	req, err := http.NewRequest("GET", "/record?query=Leeds", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("Expected Internal Server Error (500) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestSuccessfulSearchReturnsResults(t *testing.T) {
+	expectedResults := `[{"title":"Holy Trinity Church","location":{"lat":"53.8623095466826","lng":"-1.61906075748197"},"reports":[{"reportID":0,"reportDetails":"that lightsaber times, by but star consists ","url":"https://example.edu/"}]}]`
+	db := mockDB{
+		SearchFunc: func(query types.SearchQuery) ([]types.Record, error) {
+			var records []types.Record
+			buf := bytes.NewBuffer([]byte(expectedResults))
+			err := json.NewDecoder(buf).Decode(&records)
+			ok(t, err)
+			return records, nil
+		},
+	}
+	service := &WebService{DB: &db}
+	req, err := http.NewRequest("GET", "/record?query=Leeds", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if strings.TrimSpace(rr.Body.String()) != expectedResults {
+		t.Errorf("Expected response to be: \n %s \n but got: \n %s", expectedResults, rr.Body.String())
+		t.FailNow()
+	}
+
+	if rr.Code != 200 {
+		t.Errorf("Expected Success (w00) status to be returned got %d", rr.Code)
+	}
+
 }
