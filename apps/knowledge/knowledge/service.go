@@ -34,8 +34,17 @@ func (s *WebService) HealthCheck() http.HandlerFunc {
 }
 
 // NewRecord adds the passed record to the database
+// Path: /record
+// Method: POST
+// Example: /record
+//		Body: {
+//					"title": "A Location",
+//					"location": {
+//					"lng": "-1.619060757481970",
+//					"lat": "53.862309546682600"
+//					}
+//				}
 func (s *WebService) NewRecord() http.HandlerFunc {
-	// Log as JSON instead of the default ASCII formatter.
 	log.SetFormatter(&log.JSONFormatter{})
 	log.WithFields(log.Fields{
 		"event": "create",
@@ -84,7 +93,11 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 }
 
 // Search queries the database for the term passed to the path
-// as a URL query parameter
+// as a URL query parameter.
+// Path: /record
+// Method: GET
+// Parameters: query
+// Example: /record?query=Leeds
 func (s *WebService) Search() http.HandlerFunc {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.WithFields(log.Fields{
@@ -92,6 +105,7 @@ func (s *WebService) Search() http.HandlerFunc {
 	})
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		log.Debug("Called Search")
 		query := &types.SearchQuery{}
 		log.Debug(r.URL.Query())
