@@ -3,6 +3,7 @@ package knowledge
 import (
 	"net/http"
 
+	"github.com/cstdev/knowledge-hub/apps/knowledge/types"
 	"github.com/gorilla/mux"
 )
 
@@ -19,7 +20,7 @@ type Routes []Route
 
 var routes []Route
 
-func initRoutes(service Service) {
+func initRoutes(service types.Service) {
 	routes = Routes{
 		Route{
 			"HealthCheck",
@@ -27,13 +28,34 @@ func initRoutes(service Service) {
 			"/",
 			service.HealthCheck(),
 		},
+		Route{
+			"CreateRecord",
+			"POST",
+			"/record",
+			service.NewRecord(),
+		}, Route{
+			"SearchRecord",
+			"GET",
+			"/record",
+			service.Search(),
+		}, Route{
+			"UpdateRecord",
+			"PUT",
+			"/record/{id:[0-9]+}",
+			service.Update(),
+		}, Route{
+			"DeleteRecord",
+			"DELETE",
+			"/record/{id:[0-9]+}",
+			service.Delete(),
+		},
 	}
 }
 
 // NewRouter takes a Service and creates an mux.Router
 // Is uses the methods of the Service to associate the handlers
 // to their implementations
-func NewRouter(s Service) *mux.Router {
+func NewRouter(s types.Service) *mux.Router {
 	initRoutes(s)
 	router := mux.NewRouter().StrictSlash(true)
 
