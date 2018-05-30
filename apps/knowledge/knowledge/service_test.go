@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/cstdev/knowledge-hub/apps/knowledge/types"
+	"github.com/gorilla/mux"
 )
 
 // ok fails the test if an err is not nil.
@@ -28,19 +29,19 @@ type mockDB struct {
 	SearchQuery types.SearchQuery
 	CreateFunc  func(r types.Record) error
 	SearchFunc  func(query types.SearchQuery) ([]types.Record, error)
+	UpdateFunc  func(id int, r types.Record) error
 }
 
 func (db *mockDB) Create(r types.Record) error {
-	// called = true
-	// return nil
 	return db.CreateFunc(r)
 }
 
 func (db *mockDB) Search(query types.SearchQuery) ([]types.Record, error) {
-	// db.SearchQuery = query
-	// fmt.Println(query.Query)
-	// return nil
 	return db.SearchFunc(query)
+}
+
+func (db *mockDB) Update(id int, r types.Record) error {
+	return db.UpdateFunc(id, r)
 }
 
 var called bool
@@ -243,7 +244,193 @@ func TestSuccessfulSearchReturnsResults(t *testing.T) {
 	}
 
 	if rr.Code != 200 {
-		t.Errorf("Expected Success (w00) status to be returned got %d", rr.Code)
+		t.Errorf("Expected Success (200) status to be returned got %d", rr.Code)
 	}
 
+}
+
+func TestSearchReturnsNotFoundOnNoResults(t *testing.T) {
+	db := mockDB{
+		SearchFunc: func(query types.SearchQuery) ([]types.Record, error) {
+			var records []types.Record
+			return records, nil
+		},
+	}
+	service := &WebService{DB: &db}
+	req, err := http.NewRequest("GET", "/record?query=Leeds", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if strings.TrimSpace(rr.Body.String()) != "{}" {
+		t.Errorf("Expected response to be: \n {} \n but got: \n %s", rr.Body.String())
+		t.FailNow()
+	}
+
+	if rr.Code != 404 {
+		t.Errorf("Expected Success (404) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestUpdateReturnsErrorOnEmptyBody(t *testing.T) {
+	db := mockDB{}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("PUT", "/record/12345", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Update())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != 400 {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestUpdateReturnsErrorOnInvalidJSON(t *testing.T) {
+	db := mockDB{}
+	service := &WebService{DB: &db}
+
+	badJSON := []byte(`{"abc":123, def:123}`)
+	req, err := http.NewRequest("PUT", "/record/12345", bytes.NewBuffer(badJSON))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Update())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != 400 {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestUpdateReturnsServerErrorWhenNoDB(t *testing.T) {
+	service := &WebService{}
+	req, err := http.NewRequest("PUT", "/record/12345", bytes.NewBuffer(jsonReq))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	router(service).ServeHTTP(rr, req)
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("Expected internal server error status to be returned got %d", rr.Code)
+	}
+}
+
+func TestUpdateReturnsErrorIfNoIdIsProvided(t *testing.T) {
+	called = false
+	var passedID int
+	db := mockDB{
+		UpdateFunc: func(id int, r types.Record) error {
+			called = true
+			passedID = id
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("PUT", "/record", bytes.NewBuffer(jsonReq))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Update())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != 400 {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func router(service *WebService) *mux.Router {
+	r := mux.NewRouter()
+	r.HandleFunc("/record/{id}", service.Update())
+	return r
+}
+
+func TestUpdateReturnsErrorIfIDIsNotInt(t *testing.T) {
+	called = false
+	var passedID int
+	db := mockDB{
+		UpdateFunc: func(id int, r types.Record) error {
+			called = true
+			passedID = id
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("PUT", "/record/abc", bytes.NewBuffer(jsonReq))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+
+	router(service).ServeHTTP(rr, req)
+	if rr.Code != 400 {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestUpdateCallsDatabaseWithRecordAndId(t *testing.T) {
+	called = false
+	var passedID int
+	db := mockDB{
+		UpdateFunc: func(id int, r types.Record) error {
+			called = true
+			passedID = id
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("PUT", "/record/12345", bytes.NewBuffer(jsonReq))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	router(service).ServeHTTP(rr, req)
+
+	if !called {
+		t.Error("Expected database update method to be called")
+		t.FailNow()
+	}
+
+	if passedID != 12345 {
+		t.Errorf("Expected id: %d \n Got Id: %d \n", 12345, passedID)
+	}
+}
+
+func TestUpdateReturnsErrorWhenDBUpdateFails(t *testing.T) {
+
+	db := mockDB{
+		UpdateFunc: func(id int, r types.Record) error {
+			return errors.New("Database failed")
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("PUT", "/record/12345", bytes.NewBuffer(jsonReq))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	router(service).ServeHTTP(rr, req)
+
+	if rr.Code != 500 {
+		t.Errorf("Expected Internal Server Error (500) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestUpdateReturnsOkIfRecordIsUpdated(t *testing.T) {
+	db := mockDB{
+		UpdateFunc: func(id int, r types.Record) error {
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("PUT", "/record/12345", bytes.NewBuffer(jsonReq))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	router(service).ServeHTTP(rr, req)
+
+	if rr.Code != 200 {
+		t.Errorf("Expected OK (200) status to be returned got %d", rr.Code)
+	}
 }

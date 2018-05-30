@@ -3,10 +3,12 @@ package knowledge
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/cstdev/knowledge-hub/apps/knowledge/database"
 	"github.com/cstdev/knowledge-hub/apps/knowledge/types"
 	"github.com/dyninc/qstring"
+	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -57,7 +59,11 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 		decoder := json.NewDecoder(r.Body)
 
 		if r.Body == nil {
+			log.WithFields(log.Fields{
+				"status": 400,
+			}).Warn("No body provided")
 			w.WriteHeader(400)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "No body provided"})
 			return
 		}
 
@@ -65,7 +71,8 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to parse JSON"})
 			log.WithFields(log.Fields{
-				"error": err.Error(),
+				"error":  err.Error(),
+				"status": 400,
 			}).Error("Unable to parse JSON")
 			return
 		}
@@ -73,7 +80,9 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 		if s.DB == nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to connect to database"})
-			log.Error("No database set")
+			log.WithFields(log.Fields{
+				"status": 500,
+			}).Error("No database set")
 			return
 		}
 
@@ -153,6 +162,16 @@ func (s *WebService) Search() http.HandlerFunc {
 			return
 		}
 
+		if len(records) == 0 {
+			log.WithFields(log.Fields{
+				"status":   404,
+				"response": records,
+			}).Info("No results found")
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("{}"))
+			return
+		}
+
 		log.WithFields(log.Fields{
 			"status":   200,
 			"response": records,
@@ -160,4 +179,100 @@ func (s *WebService) Search() http.HandlerFunc {
 		json.NewEncoder(w).Encode(records)
 	}
 
+}
+
+// Update takes a record and writes any changes to the database
+// Path: /record
+// Method: PUT
+// Example: /record/12345
+//		Body: {
+//					"location": {
+//					"lng": "-5.619060757481970",
+//					"lat": "52.862309546682600"
+//					}
+//				}
+func (s *WebService) Update() http.HandlerFunc {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.WithFields(log.Fields{
+		"event": "update",
+	})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		vars := mux.Vars(r)
+
+		log.WithFields(log.Fields{
+			"vars": vars,
+		}).Debug("Passed Vars")
+
+		strID := vars["id"]
+
+		log.WithFields(log.Fields{
+			"id": strID,
+		}).Debug("Passed Id")
+
+		if strID == "" {
+			log.WithFields(log.Fields{
+				"status": 400,
+			}).Warn("No ID provided")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "No ID provided"})
+			return
+		}
+
+		id, err := strconv.Atoi(strID)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"status": 400,
+				"id":     strID,
+			}).Warn("Invalid ID provided")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Invalid ID provided"})
+			return
+		}
+
+		if r.Body == nil {
+			log.WithFields(log.Fields{
+				"status": 400,
+			}).Warn("No body provided")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "No body provided"})
+			return
+		}
+
+		var rec types.Record
+		decoder := json.NewDecoder(r.Body)
+
+		if err := decoder.Decode(&rec); err != nil {
+			log.WithFields(log.Fields{
+				"error":  err.Error(),
+				"status": 400,
+			}).Error("Unable to parse JSON")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to parse JSON"})
+			return
+		}
+
+		if s.DB == nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to connect to database"})
+			log.WithFields(log.Fields{
+				"status": 500,
+			}).Error("No database set")
+			return
+		}
+
+		err = s.DB.Update(id, rec)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Failed to update record"})
+			log.WithFields(log.Fields{
+				"status": 500,
+				"error":  err.Error(),
+			}).Error("Failed to update record")
+			return
+		}
+	}
 }

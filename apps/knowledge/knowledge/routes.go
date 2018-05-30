@@ -38,6 +38,11 @@ func initRoutes(service types.Service) {
 			"GET",
 			"/record",
 			service.Search(),
+		}, Route{
+			"UpdateRecord",
+			"PUT",
+			"/record/{id:[0-9]+}",
+			service.Update(),
 		},
 	}
 }

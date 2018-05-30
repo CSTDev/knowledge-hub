@@ -7,6 +7,7 @@ type Service interface {
 	HealthCheck() http.HandlerFunc
 	NewRecord() http.HandlerFunc
 	Search() http.HandlerFunc
+	Update() http.HandlerFunc
 }
 
 // SearchQuery marshalls the query params into a search term
