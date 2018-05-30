@@ -7,7 +7,6 @@ import * as _ from 'lodash';
 import { Button } from 'react-md';
 
 
-
 // Webpack/leaflet fix
 // See https://github.com/Leaflet/Leaflet/issues/4968
 import L from 'leaflet';
@@ -32,18 +31,30 @@ export class MapView extends React.Component {
     }
   }
 
+  newPoint = (e) => {
+    console.dir(e.latlng)
+    var newReport = {
+      "title": "New",
+      "location": {
+        "lng": e.latlng.lng,
+        "lat": e.latlng.lat
+      },
+    }
+    this.props.view(newReport)
+  }
+
   render() {
     const position = [this.state.lat, this.state.lng]
 
     return (
       <div className="mapContainer">
-        <Map center={position} zoom={this.state.zoom}>
-          <TileLayer
-            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <MarkerGroup reports={this.props.reports} view={this.props.view} viewSummary={this.props.viewSummary}/>
-        </Map>
+          <Map center={position} zoom={this.state.zoom} oncontextmenu={this.newPoint}>
+            <TileLayer
+              url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <MarkerGroup reports={this.props.reports} view={this.props.view} viewSummary={this.props.viewSummary}/>
+          </Map>
       </div>
     );
   }

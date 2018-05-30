@@ -56,6 +56,7 @@ export class ReportDialog extends React.Component {
       const report = this.state.report || this.props.report;
       const lat = formatLatitude(report.location.lat, {degrees: true});
       const lon = formatLongitude(report.location.lng, {degrees: true});
+      console.dir(this.props.report)
 
       return <DialogContainer visible={this.props.report !== null}
                               id="reportDialog"
@@ -72,6 +73,7 @@ export class ReportDialog extends React.Component {
           <h1>Details</h1>
           <h2>{report.title}</h2>
           <h3>{lat} {lon}</h3>
+          {this.props.report.reports !== undefined &&
           <Grid>
             <Cell size={6}>
               <h2>Reports</h2>
@@ -81,7 +83,7 @@ export class ReportDialog extends React.Component {
               <h2>Details</h2>
               {this.renderDetails(report)}
             </Cell>
-          </Grid>
+          </Grid>}
 
 
         </Paper>
