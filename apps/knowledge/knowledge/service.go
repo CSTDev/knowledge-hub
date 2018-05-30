@@ -254,6 +254,12 @@ func (s *WebService) Update() http.HandlerFunc {
 			}).Error("Failed to update record")
 			return
 		}
+
+		log.WithFields(log.Fields{
+			"status": 200,
+			"id":     id,
+		}).Info("Updated record")
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
