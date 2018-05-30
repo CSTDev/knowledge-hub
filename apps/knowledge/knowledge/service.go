@@ -2,6 +2,7 @@ package knowledge
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -199,36 +200,15 @@ func (s *WebService) Update() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		vars := mux.Vars(r)
 
-		log.WithFields(log.Fields{
-			"vars": vars,
-		}).Debug("Passed Vars")
-
-		strID := vars["id"]
-
-		log.WithFields(log.Fields{
-			"id": strID,
-		}).Debug("Passed Id")
-
-		if strID == "" {
-			log.WithFields(log.Fields{
-				"status": 400,
-			}).Warn("No ID provided")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(&ErrorResponse{Message: "No ID provided"})
-			return
-		}
-
-		id, err := strconv.Atoi(strID)
-
+		id, err := getRecordID(r)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"status": 400,
-				"id":     strID,
-			}).Warn("Invalid ID provided")
+				"error":  err.Error(),
+			}).Warn("Issue with ID")
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Invalid ID provided"})
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: err.Error()})
 			return
 		}
 
@@ -275,4 +255,74 @@ func (s *WebService) Update() http.HandlerFunc {
 			return
 		}
 	}
+}
+
+// Delete takes a record ID and marks it as deleted
+// Path: /record
+// Method: DELETE
+// Example: /record/12345
+func (s *WebService) Delete() http.HandlerFunc {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.WithFields(log.Fields{
+		"event": "delete",
+	})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		id, err := getRecordID(r)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"status": 400,
+				"error":  err.Error(),
+			}).Warn("Issue with ID")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: err.Error()})
+			return
+		}
+
+		err = s.DB.Delete(id)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Failed to delete record"})
+			log.WithFields(log.Fields{
+				"status": 500,
+				"error":  err.Error(),
+			}).Error("Failed to delete record")
+			return
+		}
+
+		log.WithFields(log.Fields{
+			"status": 200,
+			"id":     id,
+		}).Info("Deleted record")
+		w.WriteHeader(http.StatusOK)
+	}
+
+}
+
+func getRecordID(r *http.Request) (int, error) {
+	vars := mux.Vars(r)
+
+	log.WithFields(log.Fields{
+		"vars": vars,
+	}).Debug("Passed Vars")
+
+	strID := vars["id"]
+
+	log.WithFields(log.Fields{
+		"id": strID,
+	}).Debug("Passed Id")
+
+	if strID == "" {
+		return 0, errors.New("No ID provided")
+	}
+
+	id, err := strconv.Atoi(strID)
+
+	if err != nil {
+		return 0, errors.New("Invalid ID provided")
+	}
+
+	return id, nil
 }

@@ -30,6 +30,7 @@ type mockDB struct {
 	CreateFunc  func(r types.Record) error
 	SearchFunc  func(query types.SearchQuery) ([]types.Record, error)
 	UpdateFunc  func(id int, r types.Record) error
+	DeleteFunc  func(id int) error
 }
 
 func (db *mockDB) Create(r types.Record) error {
@@ -42,6 +43,10 @@ func (db *mockDB) Search(query types.SearchQuery) ([]types.Record, error) {
 
 func (db *mockDB) Update(id int, r types.Record) error {
 	return db.UpdateFunc(id, r)
+}
+
+func (db *mockDB) Delete(id int) error {
+	return db.DeleteFunc(id)
 }
 
 var called bool
@@ -310,23 +315,15 @@ func TestUpdateReturnsServerErrorWhenNoDB(t *testing.T) {
 	ok(t, err)
 
 	rr := httptest.NewRecorder()
-	router(service).ServeHTTP(rr, req)
+	updateRouter(service).ServeHTTP(rr, req)
 	if rr.Code != http.StatusInternalServerError {
 		t.Errorf("Expected internal server error status to be returned got %d", rr.Code)
 	}
 }
 
 func TestUpdateReturnsErrorIfNoIdIsProvided(t *testing.T) {
-	called = false
-	var passedID int
-	db := mockDB{
-		UpdateFunc: func(id int, r types.Record) error {
-			called = true
-			passedID = id
-			return nil
-		},
-	}
-	service := &WebService{DB: &db}
+
+	service := &WebService{}
 
 	req, err := http.NewRequest("PUT", "/record", bytes.NewBuffer(jsonReq))
 	ok(t, err)
@@ -339,7 +336,7 @@ func TestUpdateReturnsErrorIfNoIdIsProvided(t *testing.T) {
 	}
 }
 
-func router(service *WebService) *mux.Router {
+func updateRouter(service *WebService) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/record/{id}", service.Update())
 	return r
@@ -362,7 +359,7 @@ func TestUpdateReturnsErrorIfIDIsNotInt(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	router(service).ServeHTTP(rr, req)
+	updateRouter(service).ServeHTTP(rr, req)
 	if rr.Code != 400 {
 		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
 	}
@@ -384,7 +381,7 @@ func TestUpdateCallsDatabaseWithRecordAndId(t *testing.T) {
 	ok(t, err)
 
 	rr := httptest.NewRecorder()
-	router(service).ServeHTTP(rr, req)
+	updateRouter(service).ServeHTTP(rr, req)
 
 	if !called {
 		t.Error("Expected database update method to be called")
@@ -409,7 +406,7 @@ func TestUpdateReturnsErrorWhenDBUpdateFails(t *testing.T) {
 	ok(t, err)
 
 	rr := httptest.NewRecorder()
-	router(service).ServeHTTP(rr, req)
+	updateRouter(service).ServeHTTP(rr, req)
 
 	if rr.Code != 500 {
 		t.Errorf("Expected Internal Server Error (500) status to be returned got %d", rr.Code)
@@ -428,9 +425,110 @@ func TestUpdateReturnsOkIfRecordIsUpdated(t *testing.T) {
 	ok(t, err)
 
 	rr := httptest.NewRecorder()
-	router(service).ServeHTTP(rr, req)
+	updateRouter(service).ServeHTTP(rr, req)
 
 	if rr.Code != 200 {
 		t.Errorf("Expected OK (200) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestDeleteReturnsErrorIfNoIdProvided(t *testing.T) {
+	service := &WebService{}
+
+	req, err := http.NewRequest("DELETE", "/record", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Delete())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != 400 {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func deleteRouter(service *WebService) *mux.Router {
+	r := mux.NewRouter()
+	r.HandleFunc("/record/{id}", service.Delete())
+	return r
+}
+
+func TestDeleteReturnsErrorIfIDIsNotInt(t *testing.T) {
+	service := &WebService{}
+
+	req, err := http.NewRequest("DELETE", "/record/abc", bytes.NewBuffer(jsonReq))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+
+	deleteRouter(service).ServeHTTP(rr, req)
+	if rr.Code != 400 {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestDeleteCallsDatabaseDelete(t *testing.T) {
+	called = false
+	var passedID int
+	db := mockDB{
+		DeleteFunc: func(id int) error {
+			called = true
+			passedID = id
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("DELETE", "/record/12345", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	deleteRouter(service).ServeHTTP(rr, req)
+
+	if !called {
+		t.Error("Expected database delete method to be called")
+		t.FailNow()
+	}
+
+	expectedID := 12345
+	if passedID != expectedID {
+		t.Errorf("Expected id: %d \n Got Id: %d \n", expectedID, passedID)
+	}
+}
+
+func TestOnDeleteErrorServerErrorIsReturned(t *testing.T) {
+	db := mockDB{
+		DeleteFunc: func(id int) error {
+			return errors.New("Database failed")
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("DELETE", "/record/12345", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	deleteRouter(service).ServeHTTP(rr, req)
+
+	if rr.Code != 500 {
+		t.Errorf("Expected Internal Server Error (500) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestSuccessfulDeleteOkIsReturned(t *testing.T) {
+	db := mockDB{
+		DeleteFunc: func(id int) error {
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("DELETE", "/record/12345", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	deleteRouter(service).ServeHTTP(rr, req)
+
+	if rr.Code != 200 {
+		t.Errorf("Expected Ok (200) status to be returned got %d", rr.Code)
 	}
 }

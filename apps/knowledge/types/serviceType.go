@@ -8,6 +8,7 @@ type Service interface {
 	NewRecord() http.HandlerFunc
 	Search() http.HandlerFunc
 	Update() http.HandlerFunc
+	Delete() http.HandlerFunc
 }
 
 // SearchQuery marshalls the query params into a search term
