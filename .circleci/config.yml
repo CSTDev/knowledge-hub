@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  hub:
+    docker:
+      - image: circleci/node:7.10
+    working_directory: ~/apps/hub
+    steps:
+      - checkout
+      - run: npm install
+      
