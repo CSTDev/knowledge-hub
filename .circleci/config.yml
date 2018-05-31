@@ -22,6 +22,9 @@ workflows:
     jobs:
       - build-hub
       - deploy-hub:
+          filters:
+            branches:
+              only: master
           requires:
             - build-hub
 
