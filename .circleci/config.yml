@@ -7,4 +7,9 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      
+
+deployment:
+  staging:
+    branch: master
+    heroku:
+      appname: cstdev-hub 
