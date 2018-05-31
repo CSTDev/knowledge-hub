@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/cstdev/knowledge-hub/apps/knowledge/database"
 	"github.com/cstdev/knowledge-hub/apps/knowledge/types"
@@ -21,6 +20,10 @@ type WebService struct {
 // ErrorResponse is returned for non 200 status'
 type ErrorResponse struct {
 	Message string
+}
+
+type Response struct {
+	ID string
 }
 
 // HealthCheck returns if the service is up and running.
@@ -87,18 +90,22 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 			return
 		}
 
-		err := s.DB.Create(rec)
+		id, err := s.DB.Create(rec)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Failed to create new record"})
 			log.WithFields(log.Fields{
 				"error": err.Error(),
 			}).Error("Failed to create new record")
+			return
 		}
 
-		log.Info("Successfully created new record")
+		log.WithFields(log.Fields{
+			"id":     id,
+			"status": 201,
+		}).Info("Successfully created new record")
 		w.WriteHeader(http.StatusCreated)
-
+		json.NewEncoder(w).Encode(&Response{ID: id})
 	}
 }
 
@@ -243,6 +250,8 @@ func (s *WebService) Update() http.HandlerFunc {
 			return
 		}
 
+		rec.ID = id
+
 		err = s.DB.Update(id, rec)
 
 		if err != nil {
@@ -307,7 +316,7 @@ func (s *WebService) Delete() http.HandlerFunc {
 
 }
 
-func getRecordID(r *http.Request) (int, error) {
+func getRecordID(r *http.Request) (string, error) {
 	vars := mux.Vars(r)
 
 	log.WithFields(log.Fields{
@@ -321,14 +330,14 @@ func getRecordID(r *http.Request) (int, error) {
 	}).Debug("Passed Id")
 
 	if strID == "" {
-		return 0, errors.New("No ID provided")
+		return "", errors.New("No ID provided")
 	}
 
-	id, err := strconv.Atoi(strID)
+	// id, err := strconv.Atoi(strID)
 
-	if err != nil {
-		return 0, errors.New("Invalid ID provided")
-	}
+	// if err != nil {
+	// 	return 0, errors.New("Invalid ID provided")
+	// }
 
-	return id, nil
+	return strID, nil
 }

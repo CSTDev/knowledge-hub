@@ -3,9 +3,31 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/cstdev/knowledge-hub"
+  packages = [
+    "apps/knowledge/database",
+    "apps/knowledge/knowledge",
+    "apps/knowledge/types"
+  ]
+  revision = "269ceb3a6cf60af77807944e1f0baf4917d5060e"
+
+[[projects]]
+  branch = "master"
   name = "github.com/dyninc/qstring"
   packages = ["."]
   revision = "ab5840a88e818d51076cb7e9708e7cb7ff125a27"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/globalsign/mgo"
+  packages = [
+    ".",
+    "bson",
+    "internal/json",
+    "internal/sasl",
+    "internal/scram"
+  ]
+  revision = "efe0945164a7e582241f37ae8983c075f8f2e870"
 
 [[projects]]
   name = "github.com/gorilla/context"
@@ -49,6 +71,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bb3deb00e3b02a2ff7cfc3dd29092f5549c3cec9144c7a3c2e008fea47c97d6b"
+  inputs-digest = "1ba0bb1f048aba328cfd6c0221217bea5947f6b903459aa9f1d15598024bb674"
   solver-name = "gps-cdcl"
   solver-version = 1

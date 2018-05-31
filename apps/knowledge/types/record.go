@@ -1,6 +1,7 @@
 package types
 
 type Record struct {
+	ID       string   `json:"id"`
 	Title    string   `json:"title"`
 	Location location `json:"location"`
 	Reports  []Report `json:"reports"`
