@@ -15,7 +15,18 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 }
 
 func main() {
-	db := &database.FakeDB{}
+	dbURL := "172.17.0.2"
+	dbName := "knowledge-hub"
+	dbCollection := "records"
+
+	log.SetLevel(log.DebugLevel)
+
+	db := &database.MongoDB{
+		URL:        dbURL,
+		Database:   dbName,
+		Collection: dbCollection,
+	}
+
 	var service = &knowledge.WebService{DB: db}
 
 	router := knowledge.NewRouter(service)
