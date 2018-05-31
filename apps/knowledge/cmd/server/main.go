@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/cstdev/knowledge-hub/apps/knowledge/database"
 	"github.com/cstdev/knowledge-hub/apps/knowledge/knowledge"
@@ -29,7 +30,13 @@ func main() {
 
 	var service = &knowledge.WebService{DB: db}
 
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		log.Fatal("$Port must be set")
+	}
+
 	router := knowledge.NewRouter(service)
-	log.WithField("port", 8000).Info("Starting server")
-	log.Fatal(http.ListenAndServe(":8000", setupGlobalMiddleware(router)))
+	log.WithField("port", port).Info("Starting server")
+	log.Fatal(http.ListenAndServe(":"+port, setupGlobalMiddleware(router)))
 }
