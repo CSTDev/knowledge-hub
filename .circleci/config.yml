@@ -30,7 +30,7 @@ jobs:
       - checkout
       - run:
           name: Deploy to Heroku
-          command: git subtree push --prefix apps/hub https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_API_APP_NAME.git master
+          command: git subtree push --prefix apps/knowledge https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_API_APP_NAME.git master
 
 workflows:
   version: 2
