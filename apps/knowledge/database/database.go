@@ -31,7 +31,8 @@ func (db *MongoDB) Create(r types.Record) (string, error) {
 		return "", err
 	}
 
-	c := session.DB(db.Database).C(db.Collection)
+	//Use DB from URL
+	c := session.DB("").C(db.Collection)
 
 	id := bson.NewObjectId()
 	r.ID = id.Hex()
