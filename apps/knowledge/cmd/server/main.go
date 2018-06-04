@@ -22,7 +22,7 @@ func main() {
 
 	log.SetLevel(log.DebugLevel)
 
-	dbURL := os.GetEnv("MONGODB_URI")
+	dbURL := os.Getenv("MONGODB_URI")
 
 	if dbURL == "" {
 		log.Fatal("$MONGODB_URI must be set")
