@@ -54,8 +54,8 @@ var called bool
 var jsonReq = []byte(`{
 	"title": "Holy Trinity Church",
 	"location": {
-	  "lng": "-1.619060757481970",
-	  "lat": "53.862309546682600"
+	  "lng": -1.619060757481970,
+	  "lat": 53.862309546682600
 	},
 	"reports": [
 	  {
@@ -226,7 +226,7 @@ func TestSearchReturnsServerErrorWhenDBSearchFails(t *testing.T) {
 }
 
 func TestSuccessfulSearchReturnsResults(t *testing.T) {
-	expectedResults := `[{"id":"","title":"Holy Trinity Church","location":{"lat":"53.8623095466826","lng":"-1.61906075748197"},"reports":[{"reportID":0,"reportDetails":"that lightsaber times, by but star consists ","url":"https://example.edu/"}]}]`
+	expectedResults := `[{"id":"","title":"Holy Trinity Church","location":{"lat":53.8623095466826,"lng":-1.61906075748197},"reports":[{"reportID":0,"reportDetails":"that lightsaber times, by but star consists ","url":"https://example.edu/"}]}]`
 	db := mockDB{
 		SearchFunc: func(query types.SearchQuery) ([]types.Record, error) {
 			var records []types.Record
