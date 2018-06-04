@@ -10,7 +10,10 @@ import {FilterData} from './data/Filter';
 import {ReportDialog} from "./components/ReportDialog/reportDialog";
 import {MapView} from './components/Map/map';
 import {VersionBar} from './components/VersionBar/versionBar';
+import {CreateRecord} from './data/api'
 import * as _ from 'lodash';
+import { ToastContainer, toast } from 'react-toastify';
+import './react-toastify.css';
 
 
 
@@ -49,6 +52,15 @@ class App extends Component {
 
   hideReport = (reportToSave) => {
     if (reportToSave) {
+      if (!reportToSave.id){
+                   
+        const response = CreateRecord(reportToSave)
+        if(!response.ok){
+          toast("Failed to Save")
+          return
+        }
+        
+      }
       const reports = _.cloneDeep(this.state.reports);
       const reportIndex = _.findIndex(reports, (report) => {
         return report.title === reportToSave.title;
@@ -69,6 +81,7 @@ class App extends Component {
   render() {
     return (
       <div>
+        <ToastContainer />
         <VersionBar version={this.state.version}/>
         <div className="mapArea">
           <div className="searchArea" style={{display: this.state.selectedReport ? "none" : "block"}}>
@@ -82,6 +95,7 @@ class App extends Component {
           <DetailsPane reports={this.state.filteredReports} showReport={this.showReport}/>
         </div>
         <ReportDialog report={this.state.selectedReport} onHide={this.hideReport}/>
+        
       </div>
     );
   }
