@@ -27,13 +27,13 @@ func ok(tb testing.TB, err error) {
 
 type mockDB struct {
 	SearchQuery types.SearchQuery
-	CreateFunc  func(r types.Record) error
+	CreateFunc  func(r types.Record) (string, error)
 	SearchFunc  func(query types.SearchQuery) ([]types.Record, error)
-	UpdateFunc  func(id int, r types.Record) error
-	DeleteFunc  func(id int) error
+	UpdateFunc  func(id string, r types.Record) error
+	DeleteFunc  func(id string) error
 }
 
-func (db *mockDB) Create(r types.Record) error {
+func (db *mockDB) Create(r types.Record) (string, error) {
 	return db.CreateFunc(r)
 }
 
@@ -41,11 +41,11 @@ func (db *mockDB) Search(query types.SearchQuery) ([]types.Record, error) {
 	return db.SearchFunc(query)
 }
 
-func (db *mockDB) Update(id int, r types.Record) error {
+func (db *mockDB) Update(id string, r types.Record) error {
 	return db.UpdateFunc(id, r)
 }
 
-func (db *mockDB) Delete(id int) error {
+func (db *mockDB) Delete(id string) error {
 	return db.DeleteFunc(id)
 }
 
@@ -54,8 +54,8 @@ var called bool
 var jsonReq = []byte(`{
 	"title": "Holy Trinity Church",
 	"location": {
-	  "lng": "-1.619060757481970",
-	  "lat": "53.862309546682600"
+	  "lng": -1.619060757481970,
+	  "lat": 53.862309546682600
 	},
 	"reports": [
 	  {
@@ -74,9 +74,9 @@ var jsonReq = []byte(`{
 func TestNewRecordCallsDatabaseWithRecord(t *testing.T) {
 	called = false
 	db := mockDB{
-		CreateFunc: func(r types.Record) error {
+		CreateFunc: func(r types.Record) (string, error) {
 			called = true
-			return nil
+			return "ABC123", nil
 		},
 	}
 	service := &WebService{DB: &db}
@@ -140,8 +140,8 @@ func TestReturnsServerErrorWhenNoDB(t *testing.T) {
 
 func TestReturnsCreatedStatusOnSuccess(t *testing.T) {
 	db := mockDB{
-		CreateFunc: func(r types.Record) error {
-			return nil
+		CreateFunc: func(r types.Record) (string, error) {
+			return "ABC123", nil
 		},
 	}
 	service := &WebService{DB: &db}
@@ -226,7 +226,7 @@ func TestSearchReturnsServerErrorWhenDBSearchFails(t *testing.T) {
 }
 
 func TestSuccessfulSearchReturnsResults(t *testing.T) {
-	expectedResults := `[{"title":"Holy Trinity Church","location":{"lat":"53.8623095466826","lng":"-1.61906075748197"},"reports":[{"reportID":0,"reportDetails":"that lightsaber times, by but star consists ","url":"https://example.edu/"}]}]`
+	expectedResults := `[{"id":"","title":"Holy Trinity Church","location":{"lat":53.8623095466826,"lng":-1.61906075748197},"reports":[{"reportID":0,"reportDetails":"that lightsaber times, by but star consists ","url":"https://example.edu/"}]}]`
 	db := mockDB{
 		SearchFunc: func(query types.SearchQuery) ([]types.Record, error) {
 			var records []types.Record
@@ -342,34 +342,11 @@ func updateRouter(service *WebService) *mux.Router {
 	return r
 }
 
-func TestUpdateReturnsErrorIfIDIsNotInt(t *testing.T) {
-	called = false
-	var passedID int
-	db := mockDB{
-		UpdateFunc: func(id int, r types.Record) error {
-			called = true
-			passedID = id
-			return nil
-		},
-	}
-	service := &WebService{DB: &db}
-
-	req, err := http.NewRequest("PUT", "/record/abc", bytes.NewBuffer(jsonReq))
-	ok(t, err)
-
-	rr := httptest.NewRecorder()
-
-	updateRouter(service).ServeHTTP(rr, req)
-	if rr.Code != 400 {
-		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
-	}
-}
-
 func TestUpdateCallsDatabaseWithRecordAndId(t *testing.T) {
 	called = false
-	var passedID int
+	var passedID string
 	db := mockDB{
-		UpdateFunc: func(id int, r types.Record) error {
+		UpdateFunc: func(id string, r types.Record) error {
 			called = true
 			passedID = id
 			return nil
@@ -388,15 +365,15 @@ func TestUpdateCallsDatabaseWithRecordAndId(t *testing.T) {
 		t.FailNow()
 	}
 
-	if passedID != 12345 {
-		t.Errorf("Expected id: %d \n Got Id: %d \n", 12345, passedID)
+	if passedID != "12345" {
+		t.Errorf("Expected id: %s \n Got Id: %s \n", "12345", passedID)
 	}
 }
 
 func TestUpdateReturnsErrorWhenDBUpdateFails(t *testing.T) {
 
 	db := mockDB{
-		UpdateFunc: func(id int, r types.Record) error {
+		UpdateFunc: func(id string, r types.Record) error {
 			return errors.New("Database failed")
 		},
 	}
@@ -415,7 +392,7 @@ func TestUpdateReturnsErrorWhenDBUpdateFails(t *testing.T) {
 
 func TestUpdateReturnsOkIfRecordIsUpdated(t *testing.T) {
 	db := mockDB{
-		UpdateFunc: func(id int, r types.Record) error {
+		UpdateFunc: func(id string, r types.Record) error {
 			return nil
 		},
 	}
@@ -452,25 +429,11 @@ func deleteRouter(service *WebService) *mux.Router {
 	return r
 }
 
-func TestDeleteReturnsErrorIfIDIsNotInt(t *testing.T) {
-	service := &WebService{}
-
-	req, err := http.NewRequest("DELETE", "/record/abc", bytes.NewBuffer(jsonReq))
-	ok(t, err)
-
-	rr := httptest.NewRecorder()
-
-	deleteRouter(service).ServeHTTP(rr, req)
-	if rr.Code != 400 {
-		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
-	}
-}
-
 func TestDeleteCallsDatabaseDelete(t *testing.T) {
 	called = false
-	var passedID int
+	var passedID string
 	db := mockDB{
-		DeleteFunc: func(id int) error {
+		DeleteFunc: func(id string) error {
 			called = true
 			passedID = id
 			return nil
@@ -489,15 +452,15 @@ func TestDeleteCallsDatabaseDelete(t *testing.T) {
 		t.FailNow()
 	}
 
-	expectedID := 12345
+	expectedID := "12345"
 	if passedID != expectedID {
-		t.Errorf("Expected id: %d \n Got Id: %d \n", expectedID, passedID)
+		t.Errorf("Expected id: %s \n Got Id: %s \n", expectedID, passedID)
 	}
 }
 
 func TestOnDeleteErrorServerErrorIsReturned(t *testing.T) {
 	db := mockDB{
-		DeleteFunc: func(id int) error {
+		DeleteFunc: func(id string) error {
 			return errors.New("Database failed")
 		},
 	}
@@ -516,7 +479,7 @@ func TestOnDeleteErrorServerErrorIsReturned(t *testing.T) {
 
 func TestSuccessfulDeleteOkIsReturned(t *testing.T) {
 	db := mockDB{
-		DeleteFunc: func(id int) error {
+		DeleteFunc: func(id string) error {
 			return nil
 		},
 	}

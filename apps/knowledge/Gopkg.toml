@@ -24,6 +24,11 @@
 #   go-tests = true
 #   unused-packages = true
 
+[metadata.heroku]
+  root-package = "github.com/cstdev/knowledge-hub/apps/knowledge"
+  go-version = "go1.9"
+  install = ["./cmd/..."]
+  ensure = "true"
 
 [prune]
   go-tests = true
