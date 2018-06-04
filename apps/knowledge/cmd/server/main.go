@@ -16,11 +16,17 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 }
 
 func main() {
-	dbURL := "172.17.0.2"
+	//dbURL := "172.17.0.2"
 	dbName := "knowledge-hub"
 	dbCollection := "records"
 
 	log.SetLevel(log.DebugLevel)
+
+	dbURL := os.GetEnv("MONGODB_URI")
+
+	if dbURL == "" {
+		log.Fatal("$MONGODB_URI must be set")
+	}
 
 	db := &database.MongoDB{
 		URL:        dbURL,
