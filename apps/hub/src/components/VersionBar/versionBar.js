@@ -6,13 +6,10 @@ export class VersionBar extends React.Component {
       super(props)
     }
   
-    render() {
-      const props = this.props;
-      console.dir(this.props)
-  
+    render() {  
       return (
       <div className="versionBar">
-        <p className="version">{props.version}</p>
+        <p className="version">{this.props.version}</p>
       </div>
     )
     }

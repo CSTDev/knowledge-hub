@@ -17,19 +17,17 @@ export class DetailsPane extends React.Component {
       return <ListItem primaryText={report.title}
                        secondaryText={`${lat} ${lon}`}
                        key={uuidv4()}
-                       leftAvatar={<Avatar suffix="deep-purple">{report.reports.length}</Avatar>}
+                       leftAvatar={<Avatar suffix="deep-purple"></Avatar>}
                        onClick={() => showReport(report)}/>;
     });
   }
 
   render() {
-    const props = this.props;
-
     return <div>
       <Paper zdepth={1} className="fillParent">
         <List>
-          <Subheader primaryText="Reports"/>
-          {this.renderItems(props.reports, props.showReport)}
+          <Subheader primaryText="Locations"/>
+          {this.renderItems(this.props.reports, this.props.showReport)}
         </List>
       </Paper>
     </div>

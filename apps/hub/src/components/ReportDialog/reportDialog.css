@@ -1,3 +1,27 @@
-#reportDialog {
+#locationDialog {
     width: calc(100%)
+}
+
+.dataInput{
+    margin: 8px;
+}
+
+.showEmpty{
+    float: right;
+    margin-right: 16px
+}
+
+.locationTitle {
+    width: calc(75%);
+}
+
+#locationTitle {
+    font-size: 32px;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+#country {
+    font-size: 24px;
+    margin-bottom: 8px;
 }

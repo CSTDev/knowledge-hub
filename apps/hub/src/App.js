@@ -26,8 +26,22 @@ class App extends Component {
       reports: Reports,
       filteredReports: Reports,
       selectedReport: null,
-      version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1"
+      version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
+      fields: []
     };
+  }
+
+  componentDidMount() {
+    //TODO call api GetFields
+    console.log("Got fields")
+    const loadedFields = [
+      "Invested",
+      "Duration",
+      "Start Date",
+      "End Date",
+      "Company"
+    ]
+    this.setState({fields: loadedFields})
   }
 
   filterChange(value, event) {
@@ -54,28 +68,48 @@ class App extends Component {
     if (reportToSave) {
       if (!reportToSave.id){
                    
-        const response = CreateRecord(reportToSave)
-        if(!response.ok){
-          toast("Failed to Save")
-          return
-        }
+        CreateRecord(reportToSave).then((response) => {
+          console.dir(response)
+          if(!response.ok){
+            toast("Failed to Save")
+            return
+          }
+          const id = response.json().then(json => {
+            return json.ID
+          }).then(id =>{
+            console.log(id)
+            reportToSave.id = id;
+
+            let newReports = this.state.reports;
+            newReports.push(reportToSave)
+            this.setState({reports: newReports})
+            console.dir(this.state)
+
+            // const reports = _.cloneDeep(this.state.reports);
+            // const reportIndex = _.findIndex(this.state.reports, (report) => {
+            //   return report.title === reportToSave.title;
+            // });
+            // console.log
+            // if (reportIndex !== -1) {
+            //   reports[reportIndex].id = id
+            // }
+            
+            // const filteredReports = FilterData(reports, this.state.filterText, null);
+    
+            // this.setState({reports, filteredReports});
+            // console.log("State after save:")
+            // console.dir(this.state)
+          });
+        })
         
       }
-      const reports = _.cloneDeep(this.state.reports);
-      const reportIndex = _.findIndex(reports, (report) => {
-        return report.title === reportToSave.title;
-      });
-      if (reportIndex !== -1) {
-        reports[reportIndex] = reportToSave;
-      }
-      const filteredReports = FilterData(reports, this.state.filterText, null);
-
-      this.setState({reports, filteredReports});
+    
     }
 
     this.setState({
       selectedReport: null
     });
+    
   };
 
   render() {
@@ -94,7 +128,7 @@ class App extends Component {
         <div className="detailsArea">
           <DetailsPane reports={this.state.filteredReports} showReport={this.showReport}/>
         </div>
-        <ReportDialog report={this.state.selectedReport} onHide={this.hideReport}/>
+        <ReportDialog report={this.state.selectedReport} onHide={this.hideReport} fields={this.state.fields} showFields={this.state.selectedReport ? !this.state.selectedReport.id : false}/>
         
       </div>
     );
