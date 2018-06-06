@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function CreateRecord(record) {
     console.log("Create called")
 

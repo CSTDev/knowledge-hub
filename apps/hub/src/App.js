@@ -11,7 +11,6 @@ import {ReportDialog} from "./components/ReportDialog/reportDialog";
 import {MapView} from './components/Map/map';
 import {VersionBar} from './components/VersionBar/versionBar';
 import {CreateRecord} from './data/api'
-import * as _ from 'lodash';
 import { ToastContainer, toast } from 'react-toastify';
 import './react-toastify.css';
 
@@ -69,21 +68,18 @@ class App extends Component {
       if (!reportToSave.id){
                    
         CreateRecord(reportToSave).then((response) => {
-          console.dir(response)
           if(!response.ok){
             toast("Failed to Save")
             return
           }
-          const id = response.json().then(json => {
+          response.json().then(json => {
             return json.ID
           }).then(id =>{
-            console.log(id)
             reportToSave.id = id;
 
             let newReports = this.state.reports;
             newReports.push(reportToSave)
             this.setState({reports: newReports})
-            console.dir(this.state)
 
             // const reports = _.cloneDeep(this.state.reports);
             // const reportIndex = _.findIndex(this.state.reports, (report) => {

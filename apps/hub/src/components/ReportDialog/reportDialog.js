@@ -1,10 +1,6 @@
 import React from 'react'
-import {DialogContainer, Toolbar, Button, Paper, Subheader, Divider, TextField, SelectionControl} from 'react-md';
+import {DialogContainer, Toolbar, Button, Paper, Divider, TextField, SelectionControl} from 'react-md';
 import {formatLatitude, formatLongitude} from 'latlon-formatter';
-import ContentEditable from 'react-sane-contenteditable';
-import FaPencil from 'react-icons/lib/fa/pencil'
-
-import * as _ from 'lodash';
 
 import './reportDialog.css'
 
@@ -89,9 +85,9 @@ export class ReportDialog extends React.Component {
                 defaultValue={report.country ? report.country : ""}
                 onChange={this.onValueChange.bind(this,"country")}
             />
-          <Subheader className="location" primary>
+          <h3 className="location">
           Lat: {lat} Lng: {lng}
-          </Subheader>
+          </h3>
           <Divider />
           {this.props.fields.map((field, index) => {
             var fieldKey = this.fieldToKey(field)
@@ -99,9 +95,8 @@ export class ReportDialog extends React.Component {
               return <TextField
                 className="dataInput"
                 key={index}
-                className={fieldKey}
                 label={field}
-                id={field}
+                id={fieldKey}
                 defaultValue={report[fieldKey] ? report[fieldKey] : ""}
                 onChange={this.onValueChange.bind(this,fieldKey)}
               />;

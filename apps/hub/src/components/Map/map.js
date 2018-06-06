@@ -39,7 +39,6 @@ export class MapView extends React.Component {
         "lat": e.latlng.lat
       },
     }
-    console.dir(newReport)
     this.props.view(newReport)
   }
 
