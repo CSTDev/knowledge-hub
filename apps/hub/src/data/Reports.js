@@ -1,5 +1,6 @@
 export const Reports = [
   {
+    "id": "1",
     "title": "Holy Trinity Church",
     "location": {
       "lng": "-1.619060757481970",
@@ -14,6 +15,8 @@ export const Reports = [
       "STATION_PCODE": "LS16 7LP",
       "additionalDetails": "Lorem Ipsum ..."
     },
+    "invested": 123456789,
+    "startDate": "21/03/1997",
     "reports": [
       {
         "reportID": 0,

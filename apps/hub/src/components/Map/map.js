@@ -32,7 +32,6 @@ export class MapView extends React.Component {
   }
 
   newPoint = (e) => {
-    console.dir(e.latlng)
     var newReport = {
       "title": "New",
       "location": {
@@ -67,8 +66,7 @@ function MarkerGroup(props){
         <Popup >
         <div className="summary">
           <h4>{report.title}</h4>
-            Description: {report.details.additionalDetails}<br/>
-            Reports: {report.reports.length}
+            Description: {report.details ? report.details.additionalDetails :""}<br/>
             <div class="buttonHolder">
               <Button raised onClick={()=>props.view(report)}>View</Button>
             </div>
