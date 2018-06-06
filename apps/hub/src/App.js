@@ -68,7 +68,7 @@ class App extends Component {
       if (!reportToSave.id){
                    
         CreateRecord(reportToSave).then((response) => {
-          if(!response.ok){
+          if(!response.ok || response.status != 201){
             toast("Failed to Save")
             return
           }
@@ -96,15 +96,19 @@ class App extends Component {
             // console.log("State after save:")
             // console.dir(this.state)
           });
+
+          this.setState({
+            selectedReport: null
+          });
         })
         
       }
     
+    } else {
+      this.setState({
+        selectedReport: null
+      });
     }
-
-    this.setState({
-      selectedReport: null
-    });
     
   };
 
