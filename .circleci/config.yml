@@ -18,11 +18,9 @@ jobs:
   build-api:
     docker:
       - image: circleci/golang:1.9
-    working_directory: ~/apps/knowledge
     steps:
       - checkout
       - run: go get -v -t -d ./...
-      - run: go build -v ./types ./...
       - run: go test -v ./...
   deploy-api:
     docker:
