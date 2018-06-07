@@ -18,7 +18,7 @@ jobs:
   build-api:
     docker:
       - image: circleci/golang:1.9
-    working_directory: /go/src/github.com/cstdev/knowledge-hub/apps/knowledge
+    working_directory: /go/src/github.com/cstdev/knowledge-hub/
     steps:
       - checkout
       - run: go get -v -t -d ./...
