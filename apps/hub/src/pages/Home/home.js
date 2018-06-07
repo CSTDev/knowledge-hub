@@ -10,7 +10,7 @@ import {FilterData} from '../../data/Filter';
 import {ReportDialog} from "../../components/ReportDialog/reportDialog";
 import {MapView} from '../../components/Map/map';
 import {VersionBar} from '../../components/VersionBar/versionBar';
-import {CreateRecord} from '../../data/api'
+import {CreateRecord, LoadFields} from '../../data/api'
 import { ToastContainer, toast } from 'react-toastify';
 import '../../react-toastify.css';
 import MenuBar from '../../components/MenuBar/menuBar';
@@ -34,14 +34,27 @@ class Home extends Component {
   componentDidMount() {
     //TODO call api GetFields
     console.log("Got fields")
-    const loadedFields = [
-      "Invested",
-      "Duration",
-      "Start Date",
-      "End Date",
-      "Company"
-    ]
-    this.setState({fields: loadedFields})
+    LoadFields().then((response) => {
+      if(!response || response.status !== 200){
+        
+        return
+      }
+      response.json().then(json => {
+          return json
+        }).then(fieldList =>{
+          this.setState({fields: fieldList})
+        })
+      
+  });
+
+    // const loadedFields = [
+    //   "Invested",
+    //   "Duration",
+    //   "Start Date",
+    //   "End Date",
+    //   "Company"
+    // ]
+    // this.setState({fields: loadedFields})
   }
 
   filterChange(value, event) {

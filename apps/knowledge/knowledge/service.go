@@ -316,6 +316,21 @@ func (s *WebService) Delete() http.HandlerFunc {
 
 }
 
+func (s *WebService) GetFields() http.HandlerFunc {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.WithFields(log.Fields{
+		"event": "GetFields",
+	})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fieldString := `[{"id": 1, "value":"Question 1", "order":"1"}, {"id": 2, "value":"Question 2", "order":"2"},{"id": 3, "value":"Question 3", "order":"3"},{"id": 4, "value":"Question 4", "order":"4"}]`
+		w.Write([]byte(fieldString))
+
+	}
+
+}
+
 func getRecordID(r *http.Request) (string, error) {
 	vars := mux.Vars(r)
 

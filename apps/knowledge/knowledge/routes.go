@@ -48,6 +48,11 @@ func initRoutes(service types.Service) {
 			"DELETE",
 			"/record/{id:[0-9]+}",
 			service.Delete(),
+		}, Route{
+			"GetFields",
+			"GET",
+			"/field",
+			service.GetFields(),
 		},
 	}
 }

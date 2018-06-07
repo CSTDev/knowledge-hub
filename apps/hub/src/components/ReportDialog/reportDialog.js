@@ -2,6 +2,7 @@ import React from 'react'
 import {DialogContainer, Toolbar, Button, Paper, Divider, TextField, SelectionControl} from 'react-md';
 import {formatLatitude, formatLongitude} from 'latlon-formatter';
 
+
 import './reportDialog.css'
 
 export class ReportDialog extends React.Component {
@@ -11,6 +12,7 @@ export class ReportDialog extends React.Component {
       report: null,
       changed: false,
       showAll: false,
+      fields: []
     }
   }
 
@@ -27,13 +29,13 @@ export class ReportDialog extends React.Component {
   }
 
   fieldToKey = (field) => {
+    console.dir(field)
     field = field.charAt(0).toLowerCase() + field.slice(1)
     field = field.replace(/\s/g,'');
     return field
   }
 
   onValueChange = (field, value, e) => {
-    //let value = e.target.value;
     let report = this.state.report;
     field = this.fieldToKey(field);
     report[field] = value;
@@ -90,12 +92,12 @@ export class ReportDialog extends React.Component {
           </h3>
           <Divider />
           {this.props.fields.map((field, index) => {
-            var fieldKey = this.fieldToKey(field)
+            var fieldKey = this.fieldToKey(field.value)
             if(this.state.showAll || report[fieldKey]){
               return <TextField
                 className="dataInput"
                 key={index}
-                label={field}
+                label={field.value}
                 id={fieldKey}
                 defaultValue={report[fieldKey] ? report[fieldKey] : ""}
                 onChange={this.onValueChange.bind(this,fieldKey)}
