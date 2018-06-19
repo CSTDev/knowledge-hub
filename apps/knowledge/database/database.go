@@ -15,13 +15,15 @@ type Database interface {
 	Search(query types.SearchQuery) ([]types.Record, error)
 	Update(id string, r types.Record) error
 	Delete(id string) error
+	Fields() ([]types.Field, error)
 }
 
 // MongoDB provides access and methods to talk to Mongo
 type MongoDB struct {
-	URL        string
-	Database   string
-	Collection string
+	URL             string
+	Database        string
+	Collection      string
+	FieldCollection string
 }
 
 // Create takes a record and writes it to the Mongo database
@@ -91,6 +93,28 @@ func (db *MongoDB) Delete(id string) error {
 	return nil
 }
 
+// Fields retrieves all the set fields that can be use for entering information
+func (db *MongoDB) Fields() ([]types.Field, error) {
+	session, err := GetSession(db.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	c := session.DB("").C(db.FieldCollection)
+
+	var fields []types.Field
+
+	err = c.Find(bson.M{}).All(&fields)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to get the fields from the database.")
+		return nil, err
+	}
+
+	return fields, nil
+}
+
 type FakeDB struct {
 }
 
@@ -108,4 +132,8 @@ func (f *FakeDB) Update(id string, r types.Record) error {
 
 func (f *FakeDB) Delete(id string) error {
 	return nil
+}
+
+func (f *FakeDB) Fields() ([]types.Field, error) {
+	return nil, nil
 }

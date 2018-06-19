@@ -38,8 +38,15 @@ class Settings extends Component {
     }
 
     componentDidMount = () => {
-        LoadFields().then((response) => {
+        LoadFields().then((response) => {                
+
             if(!response || response.status !== 200){
+                console.dir(response)
+                console.log(response.message)
+                if (response !== null && response.message == 404){
+                    toast("No fields set")
+                    return
+                }
               toast("Failed to load fields")
               return
             }

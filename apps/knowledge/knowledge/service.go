@@ -316,6 +316,7 @@ func (s *WebService) Delete() http.HandlerFunc {
 
 }
 
+// GetFields retrieves the fields that the user can enter from the database
 func (s *WebService) GetFields() http.HandlerFunc {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.WithFields(log.Fields{
@@ -324,8 +325,27 @@ func (s *WebService) GetFields() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		fieldString := `[{"id": 1, "value":"Question 1", "order":"1"}, {"id": 2, "value":"Question 2", "order":"2"},{"id": 3, "value":"Question 3", "order":"3"},{"id": 4, "value":"Question 4", "order":"4"}]`
-		w.Write([]byte(fieldString))
+
+		fields, err := s.DB.Fields()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Failed to get fields"})
+			log.WithFields(log.Fields{
+				"status": 500,
+				"error":  err.Error(),
+			}).Error("Failed to get fields")
+			return
+		}
+
+		if len(fields) == 0 {
+			log.WithFields(log.Fields{
+				"status": 404,
+			}).Info("No results found")
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("[]"))
+			return
+		}
+		json.NewEncoder(w).Encode(fields)
 
 	}
 

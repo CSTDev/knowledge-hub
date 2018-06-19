@@ -19,6 +19,7 @@ func main() {
 	//dbURL := "172.17.0.2"
 	dbName := "knowledge-hub"
 	dbCollection := "records"
+	fieldCollection := "fields"
 
 	log.SetLevel(log.DebugLevel)
 
@@ -29,9 +30,10 @@ func main() {
 	}
 
 	db := &database.MongoDB{
-		URL:        dbURL,
-		Database:   dbName,
-		Collection: dbCollection,
+		URL:             dbURL,
+		Database:        dbName,
+		Collection:      dbCollection,
+		FieldCollection: fieldCollection,
 	}
 
 	var service = &knowledge.WebService{DB: db}
