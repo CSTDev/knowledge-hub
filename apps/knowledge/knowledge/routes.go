@@ -53,6 +53,11 @@ func initRoutes(service types.Service) {
 			"GET",
 			"/field",
 			service.GetFields(),
+		}, Route{
+			"UpdateFields",
+			"PUT",
+			"/field",
+			service.UpdateFields(),
 		},
 	}
 }

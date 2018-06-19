@@ -351,6 +351,55 @@ func (s *WebService) GetFields() http.HandlerFunc {
 
 }
 
+// UpdateFields stores the fields set in the database
+func (s *WebService) UpdateFields() http.HandlerFunc {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.WithFields(log.Fields{
+		"event": "UpdateFields",
+	})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Body == nil {
+			log.WithFields(log.Fields{
+				"status": 400,
+			}).Warn("No body provided")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "No body provided"})
+			return
+		}
+
+		var fields []types.Field
+		decoder := json.NewDecoder(r.Body)
+
+		if err := decoder.Decode(&fields); err != nil {
+			log.WithFields(log.Fields{
+				"error":  err.Error(),
+				"status": 400,
+			}).Error("Unable to parse JSON")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to parse JSON"})
+			return
+		}
+
+		err := s.DB.UpdateFields(fields)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":  err.Error(),
+				"status": 500,
+			}).Error("Unable to store fields")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to store fields"})
+			return
+		}
+
+		log.WithFields(log.Fields{
+			"status": 200,
+		}).Info("Updated Fields")
+
+	}
+}
+
 func getRecordID(r *http.Request) (string, error) {
 	vars := mux.Vars(r)
 

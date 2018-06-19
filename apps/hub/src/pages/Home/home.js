@@ -32,7 +32,6 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    //TODO call api GetFields
     console.log("Got fields")
     LoadFields().then((response) => {
       if(!response || response.status !== 200){
@@ -46,15 +45,6 @@ class Home extends Component {
         })
       
   });
-
-    // const loadedFields = [
-    //   "Invested",
-    //   "Duration",
-    //   "Start Date",
-    //   "End Date",
-    //   "Company"
-    // ]
-    // this.setState({fields: loadedFields})
   }
 
   filterChange(value, event) {

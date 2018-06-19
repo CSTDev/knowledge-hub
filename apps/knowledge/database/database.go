@@ -16,6 +16,7 @@ type Database interface {
 	Update(id string, r types.Record) error
 	Delete(id string) error
 	Fields() ([]types.Field, error)
+	UpdateFields(fields []types.Field) error
 }
 
 // MongoDB provides access and methods to talk to Mongo
@@ -74,7 +75,7 @@ func (db *MongoDB) Update(id string, r types.Record) error {
 		return err
 	}
 
-	c := session.DB(db.Database).C(db.Collection)
+	c := session.DB("").C(db.Collection)
 
 	err = c.Update(bson.M{"id": id}, r)
 	if err != nil {
@@ -115,6 +116,32 @@ func (db *MongoDB) Fields() ([]types.Field, error) {
 	return fields, nil
 }
 
+// UpdateFields writes the fields objects to the database, updating any that already exist.
+func (db *MongoDB) UpdateFields(fields []types.Field) error {
+	session, err := GetSession(db.URL)
+	if err != nil {
+		return err
+	}
+
+	c := session.DB("").C(db.FieldCollection)
+
+	bulk := c.Bulk()
+
+	for _, field := range fields {
+		bulk.Upsert(bson.M{"id": field.ID}, field)
+	}
+
+	_, err = bulk.Run()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to update database.")
+		return err
+	}
+
+	return nil
+}
+
 type FakeDB struct {
 }
 
@@ -136,4 +163,8 @@ func (f *FakeDB) Delete(id string) error {
 
 func (f *FakeDB) Fields() ([]types.Field, error) {
 	return nil, nil
+}
+
+func (f *FakeDB) UpdateFields(fields []types.Field) error {
+	return nil
 }

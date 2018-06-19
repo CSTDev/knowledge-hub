@@ -26,12 +26,13 @@ func ok(tb testing.TB, err error) {
 }
 
 type mockDB struct {
-	SearchQuery   types.SearchQuery
-	CreateFunc    func(r types.Record) (string, error)
-	SearchFunc    func(query types.SearchQuery) ([]types.Record, error)
-	UpdateFunc    func(id string, r types.Record) error
-	DeleteFunc    func(id string) error
-	GetFieldsFunc func() ([]types.Field, error)
+	SearchQuery      types.SearchQuery
+	CreateFunc       func(r types.Record) (string, error)
+	SearchFunc       func(query types.SearchQuery) ([]types.Record, error)
+	UpdateFunc       func(id string, r types.Record) error
+	DeleteFunc       func(id string) error
+	GetFieldsFunc    func() ([]types.Field, error)
+	UpdateFieldsFunc func(f []types.Field) error
 }
 
 func (db *mockDB) Create(r types.Record) (string, error) {
@@ -52,6 +53,10 @@ func (db *mockDB) Delete(id string) error {
 
 func (db *mockDB) Fields() ([]types.Field, error) {
 	return db.GetFieldsFunc()
+}
+
+func (db *mockDB) UpdateFields(f []types.Field) error {
+	return db.UpdateFieldsFunc(f)
 }
 
 var called bool
@@ -602,5 +607,106 @@ func TestWhenNoFieldsAreFoundAnEmptyArrayIsReturned(t *testing.T) {
 
 	if rr.Code != 404 {
 		t.Errorf("Expected Success (404) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestUpdateFieldsReturnsErrorOnEmptyBody(t *testing.T) {
+	db := mockDB{}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("PUT", "/field", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.UpdateFields())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != 400 {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestUpdateFieldReturnsErrorOnInvalidJSONBody(t *testing.T) {
+	db := mockDB{}
+	service := &WebService{DB: &db}
+
+	badJSON := []byte(`{"abc":123, def:123}`)
+	req, err := http.NewRequest("PUT", "/field", bytes.NewBuffer(badJSON))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.UpdateFields())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != 400 {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestUpdateFieldCallsDBWithFields(t *testing.T) {
+	called = false
+	db := mockDB{
+		UpdateFieldsFunc: func(f []types.Field) error {
+			called = true
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	fieldJSON := []byte(`[{"id":"1","value":"Question 1","order":1},{"id":"2","value":"Question 2","order":2}]`)
+
+	req, err := http.NewRequest("PUT", "/field", bytes.NewBuffer(fieldJSON))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.UpdateFields())
+	handler.ServeHTTP(rr, req)
+
+	if !called {
+		t.Error("Expected database create method to be called")
+	}
+}
+
+func TestStatus500ReturnedIfUnableToWriteFieldsToDatabase(t *testing.T) {
+
+	db := mockDB{
+		UpdateFieldsFunc: func(f []types.Field) error {
+			return errors.New("Failed to write to DB")
+		},
+	}
+	service := &WebService{DB: &db}
+
+	fieldJSON := []byte(`[{"id":"1","value":"Question 1","order":1},{"id":"2","value":"Question 2","order":2}]`)
+
+	req, err := http.NewRequest("PUT", "/field", bytes.NewBuffer(fieldJSON))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.UpdateFields())
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("Expected internal server error status to be returned got %d", rr.Code)
+	}
+
+}
+
+func TestSuccessfulUpdateOfFieldsReturns200Status(t *testing.T) {
+	db := mockDB{
+		UpdateFieldsFunc: func(f []types.Field) error {
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	fieldJSON := []byte(`[{"id":"1","value":"Question 1","order":1},{"id":"2","value":"Question 2","order":2}]`)
+
+	req, err := http.NewRequest("PUT", "/field", bytes.NewBuffer(fieldJSON))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.UpdateFields())
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("Expected OK status to be returned got %d", rr.Code)
 	}
 }
