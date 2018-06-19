@@ -33,6 +33,7 @@ type mockDB struct {
 	DeleteFunc       func(id string) error
 	GetFieldsFunc    func() ([]types.Field, error)
 	UpdateFieldsFunc func(f []types.Field) error
+	DeleteFieldFunc  func(id string) error
 }
 
 func (db *mockDB) Create(r types.Record) (string, error) {
@@ -57,6 +58,10 @@ func (db *mockDB) Fields() ([]types.Field, error) {
 
 func (db *mockDB) UpdateFields(f []types.Field) error {
 	return db.UpdateFieldsFunc(f)
+}
+
+func (db *mockDB) DeleteField(id string) error {
+	return db.DeleteFieldFunc(id)
 }
 
 var called bool
@@ -708,5 +713,95 @@ func TestSuccessfulUpdateOfFieldsReturns200Status(t *testing.T) {
 
 	if rr.Code != http.StatusOK {
 		t.Errorf("Expected OK status to be returned got %d", rr.Code)
+	}
+}
+
+func TestDeleteFieldReturns400WhenNoIdIsProvided(t *testing.T) {
+	service := &WebService{}
+
+	req, err := http.NewRequest("DELETE", "/field", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.DeleteField())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != 400 {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func deleteFieldRouter(service *WebService) *mux.Router {
+	r := mux.NewRouter()
+	r.HandleFunc("/field/{id}", service.DeleteField())
+	return r
+}
+
+func TestDeleteFieldCallsTheDatabaseWithTheID(t *testing.T) {
+	called = false
+	var passedID string
+	db := mockDB{
+		DeleteFieldFunc: func(id string) error {
+
+			called = true
+			passedID = id
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("DELETE", "/field/12345", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	deleteFieldRouter(service).ServeHTTP(rr, req)
+
+	if !called {
+		t.Error("Expected database delete field method to be called")
+		t.FailNow()
+	}
+
+	expectedID := "12345"
+	if passedID != expectedID {
+		t.Errorf("Expected id: %s \n Got Id: %s \n", expectedID, passedID)
+	}
+}
+
+func TestDeleteFieldReturnsErrorIfUnableToMarkDeletedInDatabase(t *testing.T) {
+	db := mockDB{
+		DeleteFieldFunc: func(id string) error {
+			return errors.New("Failed to delete field")
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("DELETE", "/field/12345", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	deleteFieldRouter(service).ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("Expected internal server error but got %d", rr.Code)
+		t.FailNow()
+	}
+}
+
+func TestDeleteFieldReturns200OnSuccess(t *testing.T) {
+	db := mockDB{
+		DeleteFieldFunc: func(id string) error {
+			return nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("DELETE", "/field/12345", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	deleteFieldRouter(service).ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("Expected success status but got %d", rr.Code)
+		t.FailNow()
 	}
 }

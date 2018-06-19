@@ -11,6 +11,7 @@ type Service interface {
 	Delete() http.HandlerFunc
 	GetFields() http.HandlerFunc
 	UpdateFields() http.HandlerFunc
+	DeleteField() http.HandlerFunc
 }
 
 // SearchQuery marshalls the query params into a search term

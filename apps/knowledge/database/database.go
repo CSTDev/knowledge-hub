@@ -17,6 +17,7 @@ type Database interface {
 	Delete(id string) error
 	Fields() ([]types.Field, error)
 	UpdateFields(fields []types.Field) error
+	DeleteField(id string) error
 }
 
 // MongoDB provides access and methods to talk to Mongo
@@ -139,6 +140,13 @@ func (db *MongoDB) UpdateFields(fields []types.Field) error {
 		return err
 	}
 
+	return nil
+}
+
+//DeleteField takes an id of a field and marks it as deleted
+func (db *MongoDB) DeleteField(id string) error {
+
+	//TODO Implement me!!
 	return nil
 }
 

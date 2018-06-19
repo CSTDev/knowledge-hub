@@ -75,14 +75,14 @@ export class ReportDialog extends React.Component {
           />
           <TextField
                 className="locationTitle"
-                label="Location"
+                label="Name"
                 id="locationTitle"
                 defaultValue={report.title ? report.title : ""}
                 onChange={this.onValueChange.bind(this,"title")}
             />
             <TextField
                 className="country"
-                label="Country"
+                label="Location/Country"
                 id="country"
                 defaultValue={report.country ? report.country : ""}
                 onChange={this.onValueChange.bind(this,"country")}

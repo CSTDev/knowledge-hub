@@ -317,6 +317,9 @@ func (s *WebService) Delete() http.HandlerFunc {
 }
 
 // GetFields retrieves the fields that the user can enter from the database
+// Path: /field
+// Method: GET
+// Example: /field
 func (s *WebService) GetFields() http.HandlerFunc {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.WithFields(log.Fields{
@@ -345,6 +348,10 @@ func (s *WebService) GetFields() http.HandlerFunc {
 			w.Write([]byte("[]"))
 			return
 		}
+
+		log.WithFields(log.Fields{
+			"fieldCount": len(fields),
+		}).Info("Returning fields")
 		json.NewEncoder(w).Encode(fields)
 
 	}
@@ -352,6 +359,16 @@ func (s *WebService) GetFields() http.HandlerFunc {
 }
 
 // UpdateFields stores the fields set in the database
+// Path: /field
+// Method: PUT
+// Example: /field
+//		Body: [
+//				{
+//					"id": "123456",
+//					"value": "Field Name",
+//					"order": 0
+//				}
+//			]
 func (s *WebService) UpdateFields() http.HandlerFunc {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.WithFields(log.Fields{
@@ -398,6 +415,51 @@ func (s *WebService) UpdateFields() http.HandlerFunc {
 		}).Info("Updated Fields")
 
 	}
+}
+
+// DeleteField takes a field id and marks it as deleted
+// Path: /field
+// Method: DELETE
+// Example: /field/12345
+func (s *WebService) DeleteField() http.HandlerFunc {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.WithFields(log.Fields{
+		"event": "deleteField",
+	})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		id, err := getRecordID(r)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"status": 400,
+				"error":  err.Error(),
+			}).Warn("Issue with ID")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: err.Error()})
+			return
+		}
+
+		err = s.DB.DeleteField(id)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"status": 500,
+				"error":  err.Error(),
+				"id":     id,
+			}).Error("Failed to delete field")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: err.Error()})
+			return
+		}
+
+		log.WithFields(log.Fields{
+			"status": 200,
+			"id":     id,
+		}).Info("Deleted field")
+		w.WriteHeader(http.StatusOK)
+	}
+
 }
 
 func getRecordID(r *http.Request) (string, error) {

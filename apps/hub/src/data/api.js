@@ -58,3 +58,7 @@ export function UpdateField(fieldId, value){
     }
     console.log(JSON.stringify(fieldToUpdate));
 }
+
+export function DeleteField(fieldId){
+    console.log(JSON.stringify(fieldId))
+}

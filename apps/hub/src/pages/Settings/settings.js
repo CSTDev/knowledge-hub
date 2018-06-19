@@ -7,7 +7,7 @@ import {v4 as uuid } from 'uuid';
 
 import MenuBar from '../../components/MenuBar/menuBar';
 import { VersionBar } from '../../components/VersionBar/versionBar';
-import { UpdateFields, UpdateField, LoadFields } from '../../data/api';
+import { UpdateFields, DeleteField, LoadFields } from '../../data/api';
 
 import './settings.css'
 
@@ -32,7 +32,8 @@ class Settings extends Component {
 
         this.state = {
             version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
-            items: []
+            items: [],
+            disableEdit: false
         };
 
         this.onDragEnd = this.onDragEnd.bind(this)
@@ -49,6 +50,7 @@ class Settings extends Component {
                     return
                 }
               toast("Failed to load fields")
+              this.setState({disableEdit: true})
               return
             }
             response.json().then(json => {
@@ -97,11 +99,17 @@ class Settings extends Component {
 
     deleteItem = (id) => {
         let itemsArray = [...this.state.items];
-        
-        itemsArray.splice(id - 1, 1);
+        DeleteField(itemsArray[id].id)
+        itemsArray.splice(id, 1);
+
+        for(let i = 0; i < itemsArray.length; i++){
+            itemsArray[i].order = i
+        }
+
         this.setState({
             items: itemsArray
         });
+        
     }
 
     saveChanges = async () => {
@@ -175,7 +183,7 @@ class Settings extends Component {
                                                         placeholder="Enter field name"
                                                         onBlur={(e) => this.onFieldUpdate(item.id,e)}
                                                     ></TextField>
-                                                    <Button className="settings__delete-field" icon onClick={() => this.deleteItem(item.id)}>close</Button>
+                                                    <Button className="settings__delete-field" icon onClick={() => this.deleteItem(item.order)}>close</Button>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -186,8 +194,8 @@ class Settings extends Component {
                         </Droppable>
                     </DragDropContext>
                     <div className="settings__button-div">
-                        <Button raised primary className="settings__save-button" onClick={() => this.saveChanges()}>Save</Button>
-                        <Button floating primary className="settings__add-button" onClick={() => this.addItem()}>add</Button>
+                        <Button raised primary className="settings__save-button" disabled={this.state.disableEdit} onClick={() => this.saveChanges()}>Save</Button>
+                        <Button floating primary className="settings__add-button" disabled={this.state.disableEdit} onClick={() => this.addItem()}>add</Button>
                     </div>
                 </Paper>
             </div>
