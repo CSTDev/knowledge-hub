@@ -32,8 +32,23 @@ export function LoadFields(){
 
 
 export function UpdateFields(fields){
-    console.log("Updating all fields")
-    console.log(JSON.stringify(fields));
+    console.log("Updating all fields");
+    console.dir(fields)
+
+    return fetch(process.env.REACT_APP_API_URL + '/field', {
+        method:'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(
+            fields
+        )
+    }).then(response => {
+        if(!response.ok){
+            throw Error(response.status)
+        }
+        return response
+    }).catch(function(){
+        return null
+    })
 }
 
 export function UpdateField(fieldId, value){

@@ -11,7 +11,9 @@ import (
 )
 
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	handleCORS := cors.Default().Handler
+	handleCORS := cors.New(cors.Options{
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+	}).Handler
 	return handleCORS(handler)
 }
 

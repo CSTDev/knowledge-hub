@@ -91,7 +91,9 @@ export class ReportDialog extends React.Component {
           Lat: {lat} Lng: {lng}
           </h3>
           <Divider />
-          {this.props.fields.map((field, index) => {
+          {[].concat(this.props.fields)
+          .sort((a,b) => a.order > b.order)
+          .map((field, index) => {
             var fieldKey = this.fieldToKey(field.value)
             if(this.state.showAll || report[fieldKey]){
               return <TextField

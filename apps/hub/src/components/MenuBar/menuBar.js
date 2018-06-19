@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {  Button } from 'react-md';
+import { Button } from 'react-md';
 import { withRouter } from 'react-router-dom';
 
 
@@ -7,21 +7,32 @@ import './menuBar.css'
 
 class MenuBar extends Component {
 
-    nextPath = (path) => {
-        if (this.props.homeAction != null){
-            this.props.homeAction()
+    nextPath = async (path) => {
+        if (path == '/') {
+            if (this.props.homeAction !== undefined) {
+                if (await this.props.homeAction()) {
+                    console.log("Move On")
+                    this.props.history.push(path)
+                } else {
+                    console.log("Don't Move On")
+                    return
+                }
+
+            }
+        } else {
+            this.props.history.push(path)
         }
-        this.props.history.push(path)
+
     }
 
     render() {
-        return(
+        return (
             <div className="menuBar">
                 <Button className="homeIcon" id="Home" icon onClick={() => this.nextPath('/')}>
-                   home
+                    home
                 </Button>
                 <Button className="settingsIcon" id="Settings" icon onClick={() => this.nextPath('/settings')}>
-                   settings
+                    settings
                 </Button>
             </div>
         )

@@ -3,6 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Paper, Button, TextField } from 'react-md';
 import ReactDOM from 'react-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import {v4 as uuid } from 'uuid';
 
 import MenuBar from '../../components/MenuBar/menuBar';
 import { VersionBar } from '../../components/VersionBar/versionBar';
@@ -53,7 +54,8 @@ class Settings extends Component {
             response.json().then(json => {
                 return json
               }).then(fieldList =>{
-                this.setState({items: fieldList})
+                  let sortedfields = [].concat(fieldList).sort((a,b) => a.order > b.order)
+                this.setState({items: sortedfields})
               })
             
         });
@@ -83,8 +85,8 @@ class Settings extends Component {
     addItem = () => {
         let items = this.state.items;
         const item = {
-            id: `item-` + items.length, //TODO Change this to be more unique
-            value: `item ` + items.length, //TODO Just be empty on creation
+            id: uuid(),
+            value: "",
             order: items.length + 1,
         }
         items.push(item);
@@ -102,14 +104,43 @@ class Settings extends Component {
         });
     }
 
-    saveChanges = () => {
-        UpdateFields(this.state.items);
+    saveChanges = async () => {
+        if (this.validFields()){
+            let response = await UpdateFields(this.state.items);
+                if(!response || response.status !== 200){
+                    toast("Failed to save changes")
+                  return false
+                }else{       
+                console.log("Returning true") 
+                return true
+                }
+            
+        }        
+    }
+
+    validFields = () => {
+        console.dir(this.state.items)
+        let allValid = true
+        this.state.items.map(field => {
+            if (field.value == "") {
+                toast("Field value cannot be empty");
+                allValid = false;
+            }
+        })
+        return allValid
     }
 
     onFieldUpdate = (itemId, e) => {
         console.log(itemId);
-        const value = e.target.value;
-        UpdateField(itemId, value);
+//        const value = e.target.value;
+        let itemsArray = [...this.state.items];
+        var newFields = itemsArray.map(field => {
+            if(field.id == itemId){
+                return Object.assign({}, field, {value: e.target.value})
+            }
+            return field
+        });
+        this.setState({items: newFields})
     }
 
     render() {
@@ -141,6 +172,7 @@ class Settings extends Component {
                                                         className="settingsInput"
                                                         id={item.id}
                                                         defaultValue={item.value}
+                                                        placeholder="Enter field name"
                                                         onBlur={(e) => this.onFieldUpdate(item.id,e)}
                                                     ></TextField>
                                                     <Button className="settings__delete-field" icon onClick={() => this.deleteItem(item.id)}>close</Button>
