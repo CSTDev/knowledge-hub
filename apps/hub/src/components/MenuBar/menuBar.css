@@ -15,6 +15,15 @@
     float: left
 }
 
+.settingsIcon{
+    float:right;
+}
+
 i {
     font-size: 25px !important;
 }
+
+.md-btn {
+    display: flex;
+    justify-content: center;
+  }

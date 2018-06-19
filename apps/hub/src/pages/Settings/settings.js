@@ -6,7 +6,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import MenuBar from '../../components/MenuBar/menuBar';
 import { VersionBar } from '../../components/VersionBar/versionBar';
-import { UpdateField, LoadFields } from '../../data/api';
+import { UpdateFields, UpdateField, LoadFields } from '../../data/api';
 
 import './settings.css'
 
@@ -64,23 +64,39 @@ class Settings extends Component {
             result.destination.index
         );
 
+        for(let i = 0; i < items.length; i++){
+            items[i].order = i
+        }
+
         this.setState({
             items,
         });
     }
 
     addItem = () => {
-        console.log("New Item");
         let items = this.state.items;
         const item = {
-            id: `item-` + items.length,
-            content: `item ` + items.length,
+            id: `item-` + items.length, //TODO Change this to be more unique
+            value: `item ` + items.length, //TODO Just be empty on creation
+            order: items.length + 1,
         }
         items.push(item);
         this.setState({
             items,
         });
+    }
 
+    deleteItem = (id) => {
+        let itemsArray = [...this.state.items];
+        
+        itemsArray.splice(id - 1, 1);
+        this.setState({
+            items: itemsArray
+        });
+    }
+
+    saveChanges = () => {
+        UpdateFields(this.state.items);
     }
 
     onFieldUpdate = (itemId, e) => {
@@ -95,7 +111,7 @@ class Settings extends Component {
             <div>
                 <ToastContainer />
                 <VersionBar version={this.state.version} />
-                <MenuBar />
+                <MenuBar homeAction={() => this.saveChanges()}/>
                 <Paper className="settingsContent" zDepth={3}>
                     <h1>Settings</h1>
                     <DragDropContext onDragEnd={this.onDragEnd} className="fieldList">
@@ -120,6 +136,7 @@ class Settings extends Component {
                                                         defaultValue={item.value}
                                                         onBlur={(e) => this.onFieldUpdate(item.id,e)}
                                                     ></TextField>
+                                                    <Button className="settings__delete-field" icon onClick={() => this.deleteItem(item.id)}>close</Button>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -129,7 +146,10 @@ class Settings extends Component {
                             )}
                         </Droppable>
                     </DragDropContext>
-                    <Button floating primary className="settingsAddButton" onClick={() => this.addItem()}>add</Button>
+                    <div className="settings__button-div">
+                        <Button raised primary className="settings__save-button" onClick={() => this.saveChanges()}>Save</Button>
+                        <Button floating primary className="settings__add-button" onClick={() => this.addItem()}>add</Button>
+                    </div>
                 </Paper>
             </div>
         )

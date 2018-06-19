@@ -1,5 +1,5 @@
 .fieldList {
-    display: block;
+    display: flex;
 }
 
 .settingsContent {
@@ -12,9 +12,18 @@
 }
 
 .fieldItem{
+    display: flex;
     padding:8px;
 }
 
-.settingsAddButton{
-    float: right;
+.settings__button-div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin:8px;
+}
+
+
+.settings__save-button {
+    margin: 8px;
 }

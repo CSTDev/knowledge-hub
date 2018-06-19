@@ -17,14 +17,6 @@ export function CreateRecord(record) {
         })
 }
 
-export function UpdateField(fieldId, value){
-    const fieldToUpdate = {
-        id: fieldId,
-        value: value
-    }
-    console.log(JSON.stringify(fieldToUpdate));
-}
-
 export function LoadFields(){
     return fetch(process.env.REACT_APP_API_URL + '/field', {
         method: 'GET'
@@ -36,4 +28,18 @@ export function LoadFields(){
     }).catch(function(){
         return null
     });
+}
+
+
+export function UpdateFields(fields){
+    console.log("Updating all fields")
+    console.log(JSON.stringify(fields));
+}
+
+export function UpdateField(fieldId, value){
+    const fieldToUpdate = {
+        id: fieldId,
+        value: value
+    }
+    console.log(JSON.stringify(fieldToUpdate));
 }

@@ -8,6 +8,9 @@ import './menuBar.css'
 class MenuBar extends Component {
 
     nextPath = (path) => {
+        if (this.props.homeAction != null){
+            this.props.homeAction()
+        }
         this.props.history.push(path)
     }
 
