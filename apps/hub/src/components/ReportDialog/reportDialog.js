@@ -29,7 +29,6 @@ export class ReportDialog extends React.Component {
   }
 
   fieldToKey = (field) => {
-    console.dir(field)
     field = field.charAt(0).toLowerCase() + field.slice(1)
     field = field.replace(/\s/g,'');
     return field

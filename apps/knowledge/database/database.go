@@ -106,7 +106,7 @@ func (db *MongoDB) Fields() ([]types.Field, error) {
 
 	var fields []types.Field
 
-	err = c.Find(bson.M{}).All(&fields)
+	err = c.Find(bson.M{"deleted": bson.M{"$ne": true}}).All(&fields)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -136,7 +136,7 @@ func (db *MongoDB) UpdateFields(fields []types.Field) error {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Error("Failed to update database.")
+		}).Error("Failed to update field in the database.")
 		return err
 	}
 
@@ -146,7 +146,22 @@ func (db *MongoDB) UpdateFields(fields []types.Field) error {
 //DeleteField takes an id of a field and marks it as deleted
 func (db *MongoDB) DeleteField(id string) error {
 
-	//TODO Implement me!!
+	session, err := GetSession(db.URL)
+	if err != nil {
+		return err
+	}
+
+	c := session.DB("").C(db.FieldCollection)
+
+	err = c.Update(bson.M{"id": id}, bson.M{"$set": bson.M{"deleted": true}})
+	if err != nil {
+		log.WithFields(log.Fields{
+			"id":    id,
+			"error": err.Error(),
+		}).Error("Failed to delete field in the database.")
+		return err
+	}
+
 	return nil
 }
 

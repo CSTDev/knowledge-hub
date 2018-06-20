@@ -11,10 +11,8 @@ class MenuBar extends Component {
         if (path == '/') {
             if (this.props.homeAction !== undefined) {
                 if (await this.props.homeAction()) {
-                    console.log("Move On")
                     this.props.history.push(path)
                 } else {
-                    console.log("Don't Move On")
                     return
                 }
 

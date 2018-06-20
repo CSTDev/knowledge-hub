@@ -62,7 +62,7 @@ func initRoutes(service types.Service) {
 			"DeleteField",
 			"DELETE",
 			"/field/{id}",
-			service.UpdateFields(),
+			service.DeleteField(),
 		},
 	}
 }

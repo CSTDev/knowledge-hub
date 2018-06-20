@@ -32,7 +32,6 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    console.log("Got fields")
     LoadFields().then((response) => {
       if(!response || response.status !== 200){
         

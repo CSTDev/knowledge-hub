@@ -3,7 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Paper, Button, TextField } from 'react-md';
 import ReactDOM from 'react-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import {v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import MenuBar from '../../components/MenuBar/menuBar';
 import { VersionBar } from '../../components/VersionBar/versionBar';
@@ -40,26 +40,24 @@ class Settings extends Component {
     }
 
     componentDidMount = () => {
-        LoadFields().then((response) => {                
+        LoadFields().then((response) => {
 
-            if(!response || response.status !== 200){
-                console.dir(response)
-                console.log(response.message)
-                if (response !== null && response.message == 404){
+            if (!response || response.status !== 200) {
+                if (response !== null && response.message == 404) {
                     toast("No fields set")
                     return
                 }
-              toast("Failed to load fields")
-              this.setState({disableEdit: true})
-              return
+                toast("Failed to load fields")
+                this.setState({ disableEdit: true })
+                return
             }
             response.json().then(json => {
                 return json
-              }).then(fieldList =>{
-                  let sortedfields = [].concat(fieldList).sort((a,b) => a.order > b.order)
-                this.setState({items: sortedfields})
-              })
-            
+            }).then(fieldList => {
+                let sortedfields = [].concat(fieldList).sort((a, b) => a.order > b.order)
+                this.setState({ items: sortedfields })
+            })
+
         });
     }
 
@@ -75,7 +73,7 @@ class Settings extends Component {
             result.destination.index
         );
 
-        for(let i = 0; i < items.length; i++){
+        for (let i = 0; i < items.length; i++) {
             items[i].order = i
         }
 
@@ -99,35 +97,40 @@ class Settings extends Component {
 
     deleteItem = (id) => {
         let itemsArray = [...this.state.items];
-        DeleteField(itemsArray[id].id)
-        itemsArray.splice(id, 1);
+        DeleteField(itemsArray[id].id).then(response => {
+            if (!response || response.status !== 200) {
+                toast("Unable to remove field")
+                return
+            } else {
+                itemsArray.splice(id, 1);
 
-        for(let i = 0; i < itemsArray.length; i++){
-            itemsArray[i].order = i
-        }
+                for (let i = 0; i < itemsArray.length; i++) {
+                    itemsArray[i].order = i
+                }
 
-        this.setState({
-            items: itemsArray
+                this.setState({
+                    items: itemsArray
+                });
+            }
         });
-        
+
+
     }
 
     saveChanges = async () => {
-        if (this.validFields()){
+        if (this.validFields()) {
             let response = await UpdateFields(this.state.items);
-                if(!response || response.status !== 200){
-                    toast("Failed to save changes")
-                  return false
-                }else{       
-                console.log("Returning true") 
+            if (!response || response.status !== 200) {
+                toast("Failed to save changes")
+                return false
+            } else {
                 return true
-                }
-            
-        }        
+            }
+
+        }
     }
 
     validFields = () => {
-        console.dir(this.state.items)
         let allValid = true
         this.state.items.map(field => {
             if (field.value == "") {
@@ -139,16 +142,14 @@ class Settings extends Component {
     }
 
     onFieldUpdate = (itemId, e) => {
-        console.log(itemId);
-//        const value = e.target.value;
         let itemsArray = [...this.state.items];
         var newFields = itemsArray.map(field => {
-            if(field.id == itemId){
-                return Object.assign({}, field, {value: e.target.value})
+            if (field.id == itemId) {
+                return Object.assign({}, field, { value: e.target.value })
             }
             return field
         });
-        this.setState({items: newFields})
+        this.setState({ items: newFields })
     }
 
     render() {
@@ -157,7 +158,7 @@ class Settings extends Component {
             <div>
                 <ToastContainer />
                 <VersionBar version={this.state.version} />
-                <MenuBar homeAction={() => this.saveChanges()}/>
+                <MenuBar homeAction={() => this.saveChanges()} />
                 <Paper className="settingsContent" zDepth={3}>
                     <h1>Settings</h1>
                     <DragDropContext onDragEnd={this.onDragEnd} className="fieldList">
@@ -181,9 +182,9 @@ class Settings extends Component {
                                                         id={item.id}
                                                         defaultValue={item.value}
                                                         placeholder="Enter field name"
-                                                        onBlur={(e) => this.onFieldUpdate(item.id,e)}
+                                                        onBlur={(e) => this.onFieldUpdate(item.id, e)}
                                                     ></TextField>
-                                                    <Button className="settings__delete-field" icon onClick={() => this.deleteItem(item.order)}>close</Button>
+                                                    <Button className="settings__delete-field" icon onClick={() => { if (window.confirm('Are you sure you wish to delete this field? No one will be able to see the data associated with it.')) this.deleteItem(item.order) }}>close</Button>
                                                 </div>
                                             )}
                                         </Draggable>

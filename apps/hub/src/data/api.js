@@ -1,6 +1,4 @@
 export function CreateRecord(record) {
-    console.log("Create called")
-
         return fetch(process.env.REACT_APP_API_URL + '/record', {
             method:'POST',
             headers: {'Content-Type':'application/json'},
@@ -32,9 +30,6 @@ export function LoadFields(){
 
 
 export function UpdateFields(fields){
-    console.log("Updating all fields");
-    console.dir(fields)
-
     return fetch(process.env.REACT_APP_API_URL + '/field', {
         method:'PUT',
         headers: {'Content-Type':'application/json'},
@@ -56,9 +51,17 @@ export function UpdateField(fieldId, value){
         id: fieldId,
         value: value
     }
-    console.log(JSON.stringify(fieldToUpdate));
 }
 
 export function DeleteField(fieldId){
-    console.log(JSON.stringify(fieldId))
+    return fetch(process.env.REACT_APP_API_URL + '/field/' + fieldId, {
+        method: 'DELETE'
+    }).then(response => {
+        if(!response.ok)
+            throw Error(response.status)
+        
+        return response
+    }).catch(function(response){
+        return response
+    });
 }
