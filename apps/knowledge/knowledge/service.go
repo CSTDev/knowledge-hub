@@ -29,13 +29,13 @@ type Response struct {
 // HealthCheck returns if the service is up and running.
 func (s *WebService) HealthCheck() http.HandlerFunc {
 
-	log.SetFormatter(&log.JSONFormatter{})
-	log.WithFields(log.Fields{
+	logger := log.WithFields(log.Fields{
 		"event": "healthCheck",
 	})
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
+		logger.Info("Health Check OK")
 	}
 }
 
@@ -51,8 +51,7 @@ func (s *WebService) HealthCheck() http.HandlerFunc {
 //					}
 //				}
 func (s *WebService) NewRecord() http.HandlerFunc {
-	log.SetFormatter(&log.JSONFormatter{})
-	log.WithFields(log.Fields{
+	logger := log.WithFields(log.Fields{
 		"event": "create",
 	})
 
@@ -63,7 +62,7 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 		decoder := json.NewDecoder(r.Body)
 
 		if r.Body == nil {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 400,
 			}).Warn("No body provided")
 			w.WriteHeader(400)
@@ -74,7 +73,7 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 		if err := decoder.Decode(&rec); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to parse JSON"})
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"error":  err.Error(),
 				"status": 400,
 			}).Error("Unable to parse JSON")
@@ -84,7 +83,7 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 		if s.DB == nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to connect to database"})
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 500,
 			}).Error("No database set")
 			return
@@ -94,13 +93,13 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Failed to create new record"})
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"error": err.Error(),
 			}).Error("Failed to create new record")
 			return
 		}
 
-		log.WithFields(log.Fields{
+		logger.WithFields(log.Fields{
 			"id":     id,
 			"status": 201,
 		}).Info("Successfully created new record")
@@ -116,19 +115,18 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 // Parameters: query
 // Example: /record?query=Leeds
 func (s *WebService) Search() http.HandlerFunc {
-	log.SetFormatter(&log.JSONFormatter{})
-	log.WithFields(log.Fields{
+	logger := log.WithFields(log.Fields{
 		"event": "search",
 	})
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		log.Debug("Called Search")
+		logger.Debug("Called Search")
 		query := &types.SearchQuery{}
-		log.Debug(r.URL.Query())
+		logger.Debug(r.URL.Query())
 
 		if len(r.URL.Query()) < 1 {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 400,
 			}).Error("No query parameters provided")
 			w.WriteHeader(http.StatusBadRequest)
@@ -139,7 +137,7 @@ func (s *WebService) Search() http.HandlerFunc {
 		err := qstring.Unmarshal(r.URL.Query(), query)
 
 		if err != nil {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 400,
 				"error":  err.Error(),
 			}).Error("Unable to unmarshal query params")
@@ -150,7 +148,7 @@ func (s *WebService) Search() http.HandlerFunc {
 		}
 
 		if len(query.Query) > 100 {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 400,
 			}).Error("Query string too long")
 			w.WriteHeader(http.StatusBadRequest)
@@ -160,7 +158,7 @@ func (s *WebService) Search() http.HandlerFunc {
 
 		records, err := s.DB.Search(*query)
 		if err != nil {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"error":  err,
 				"status": 500,
 				"query":  query,
@@ -171,7 +169,7 @@ func (s *WebService) Search() http.HandlerFunc {
 		}
 
 		if len(records) == 0 {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status":   404,
 				"response": records,
 			}).Info("No results found")
@@ -180,7 +178,7 @@ func (s *WebService) Search() http.HandlerFunc {
 			return
 		}
 
-		log.WithFields(log.Fields{
+		logger.WithFields(log.Fields{
 			"status":   200,
 			"response": records,
 		}).Info("Results returned")
@@ -200,8 +198,7 @@ func (s *WebService) Search() http.HandlerFunc {
 //					}
 //				}
 func (s *WebService) Update() http.HandlerFunc {
-	log.SetFormatter(&log.JSONFormatter{})
-	log.WithFields(log.Fields{
+	logger := log.WithFields(log.Fields{
 		"event": "update",
 	})
 
@@ -210,7 +207,7 @@ func (s *WebService) Update() http.HandlerFunc {
 
 		id, err := getRecordID(r)
 		if err != nil {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 400,
 				"error":  err.Error(),
 			}).Warn("Issue with ID")
@@ -220,7 +217,7 @@ func (s *WebService) Update() http.HandlerFunc {
 		}
 
 		if r.Body == nil {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 400,
 			}).Warn("No body provided")
 			w.WriteHeader(http.StatusBadRequest)
@@ -232,7 +229,7 @@ func (s *WebService) Update() http.HandlerFunc {
 		decoder := json.NewDecoder(r.Body)
 
 		if err := decoder.Decode(&rec); err != nil {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"error":  err.Error(),
 				"status": 400,
 			}).Error("Unable to parse JSON")
@@ -244,7 +241,7 @@ func (s *WebService) Update() http.HandlerFunc {
 		if s.DB == nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to connect to database"})
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 500,
 			}).Error("No database set")
 			return
@@ -257,14 +254,14 @@ func (s *WebService) Update() http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Failed to update record"})
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 500,
 				"error":  err.Error(),
 			}).Error("Failed to update record")
 			return
 		}
 
-		log.WithFields(log.Fields{
+		logger.WithFields(log.Fields{
 			"status": 200,
 			"id":     id,
 		}).Info("Updated record")
@@ -277,8 +274,7 @@ func (s *WebService) Update() http.HandlerFunc {
 // Method: DELETE
 // Example: /record/12345
 func (s *WebService) Delete() http.HandlerFunc {
-	log.SetFormatter(&log.JSONFormatter{})
-	log.WithFields(log.Fields{
+	logger := log.WithFields(log.Fields{
 		"event": "delete",
 	})
 
@@ -287,7 +283,7 @@ func (s *WebService) Delete() http.HandlerFunc {
 
 		id, err := getRecordID(r)
 		if err != nil {
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 400,
 				"error":  err.Error(),
 			}).Warn("Issue with ID")
@@ -300,17 +296,178 @@ func (s *WebService) Delete() http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Failed to delete record"})
-			log.WithFields(log.Fields{
+			logger.WithFields(log.Fields{
 				"status": 500,
 				"error":  err.Error(),
 			}).Error("Failed to delete record")
 			return
 		}
 
-		log.WithFields(log.Fields{
+		logger.WithFields(log.Fields{
 			"status": 200,
 			"id":     id,
 		}).Info("Deleted record")
+		w.WriteHeader(http.StatusOK)
+	}
+
+}
+
+// GetFields retrieves the fields that the user can enter from the database
+// Path: /field
+// Method: GET
+// Example: /field
+func (s *WebService) GetFields() http.HandlerFunc {
+
+	logger := log.WithFields(log.Fields{
+		"event": "GetFields",
+	})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		fields, err := s.DB.Fields()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Failed to get fields"})
+			logger.WithFields(log.Fields{
+				"status": 500,
+				"error":  err.Error(),
+			}).Error("Failed to get fields")
+			return
+		}
+
+		if len(fields) == 0 {
+			logger.WithFields(log.Fields{
+				"status": 404,
+			}).Info("No fields found")
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("[]"))
+			return
+		}
+
+		logger.WithFields(log.Fields{
+			"fieldCount": len(fields),
+		}).Info("Returning fields")
+		json.NewEncoder(w).Encode(fields)
+
+	}
+
+}
+
+// UpdateFields stores the fields set in the database
+// Path: /field
+// Method: PUT
+// Example: /field
+//		Body: [
+//				{
+//					"id": "123456",
+//					"value": "Field Name",
+//					"order": 0
+//				}
+//			]
+func (s *WebService) UpdateFields() http.HandlerFunc {
+	logger := log.WithFields(log.Fields{
+		"event": "UpdateFields",
+	})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Body == nil {
+			logger.WithFields(log.Fields{
+				"status": 400,
+			}).Warn("No body provided")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "No body provided"})
+			return
+		}
+
+		var fields []types.Field
+		decoder := json.NewDecoder(r.Body)
+
+		if err := decoder.Decode(&fields); err != nil {
+			logger.WithFields(log.Fields{
+				"error":  err.Error(),
+				"status": 400,
+			}).Error("Unable to parse JSON")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to parse JSON"})
+			return
+		}
+
+		err := s.DB.UpdateFields(fields)
+		if err != nil {
+			logger.WithFields(log.Fields{
+				"error":  err.Error(),
+				"status": 500,
+			}).Error("Unable to store fields")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to store fields"})
+			return
+		}
+
+		logger.WithFields(log.Fields{
+			"status": 200,
+		}).Info("Updated Fields")
+
+	}
+}
+
+// DeleteField takes a field id and marks it as deleted
+// Path: /field
+// Method: DELETE
+// Example: /field/12345
+func (s *WebService) DeleteField() http.HandlerFunc {
+	logger := log.WithFields(log.Fields{
+		"event": "deleteField",
+	})
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		id, err := getRecordID(r)
+		if err != nil {
+			logger.WithFields(log.Fields{
+				"status": 400,
+				"error":  err.Error(),
+			}).Warn("Issue with ID")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: err.Error()})
+			return
+		}
+
+		err = s.DB.DeleteField(id)
+		if err != nil {
+
+			_, ok := err.(*types.FieldNotFoundError)
+			logger.WithFields(log.Fields{
+				"result": ok,
+			}).Debug("Check if error from database is FieldNotFound")
+
+			if ok {
+				logger.WithFields(log.Fields{
+					"status": 404,
+					"error":  err.Error(),
+					"id":     id,
+				}).Warn("Couldn't find field to delete")
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(&ErrorResponse{Message: err.Error()})
+				return
+			}
+
+			logger.WithFields(log.Fields{
+				"status": 500,
+				"error":  err.Error(),
+				"id":     id,
+			}).Error("Failed to delete field")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: err.Error()})
+			return
+		}
+
+		logger.WithFields(log.Fields{
+			"status": 200,
+			"id":     id,
+		}).Info("Deleted field")
 		w.WriteHeader(http.StatusOK)
 	}
 

@@ -1,0 +1,29 @@
+.fieldList {
+    display: flex;
+}
+
+.settingsContent {
+    display:block;
+    width: calc(25%);
+    height: calc(90%);
+    padding-top:72px;
+    margin: auto;
+    background-color: E0E0E0;
+}
+
+.fieldItem{
+    display: flex;
+    padding:8px;
+}
+
+.settings__button-div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin:8px;
+}
+
+
+.settings__save-button {
+    margin: 8px;
+}

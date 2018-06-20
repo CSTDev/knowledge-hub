@@ -2,6 +2,7 @@ import React from 'react'
 import {DialogContainer, Toolbar, Button, Paper, Divider, TextField, SelectionControl} from 'react-md';
 import {formatLatitude, formatLongitude} from 'latlon-formatter';
 
+
 import './reportDialog.css'
 
 export class ReportDialog extends React.Component {
@@ -11,6 +12,7 @@ export class ReportDialog extends React.Component {
       report: null,
       changed: false,
       showAll: false,
+      fields: []
     }
   }
 
@@ -33,7 +35,6 @@ export class ReportDialog extends React.Component {
   }
 
   onValueChange = (field, value, e) => {
-    //let value = e.target.value;
     let report = this.state.report;
     field = this.fieldToKey(field);
     report[field] = value;
@@ -73,14 +74,14 @@ export class ReportDialog extends React.Component {
           />
           <TextField
                 className="locationTitle"
-                label="Location"
+                label="Name"
                 id="locationTitle"
                 defaultValue={report.title ? report.title : ""}
                 onChange={this.onValueChange.bind(this,"title")}
             />
             <TextField
                 className="country"
-                label="Country"
+                label="Location/Country"
                 id="country"
                 defaultValue={report.country ? report.country : ""}
                 onChange={this.onValueChange.bind(this,"country")}
@@ -89,13 +90,15 @@ export class ReportDialog extends React.Component {
           Lat: {lat} Lng: {lng}
           </h3>
           <Divider />
-          {this.props.fields.map((field, index) => {
-            var fieldKey = this.fieldToKey(field)
+          {[].concat(this.props.fields)
+          .sort((a,b) => a.order > b.order)
+          .map((field, index) => {
+            var fieldKey = this.fieldToKey(field.value)
             if(this.state.showAll || report[fieldKey]){
               return <TextField
                 className="dataInput"
                 key={index}
-                label={field}
+                label={field.value}
                 id={fieldKey}
                 defaultValue={report[fieldKey] ? report[fieldKey] : ""}
                 onChange={this.onValueChange.bind(this,fieldKey)}

@@ -1,0 +1,29 @@
+.menuBar {
+    position: fixed;
+    top: 16px;
+    height: 40px;
+    width: calc(100%);
+    text-align: right;
+    background: #311B92;
+}
+
+.homeIcon, .settingsIcon {
+    color: white;
+}
+
+.homeIcon {
+    float: left
+}
+
+.settingsIcon{
+    float:right;
+}
+
+i {
+    font-size: 25px !important;
+}
+
+.md-btn {
+    display: flex;
+    justify-content: center;
+  }

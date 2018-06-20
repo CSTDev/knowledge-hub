@@ -11,7 +11,9 @@ import (
 )
 
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	handleCORS := cors.Default().Handler
+	handleCORS := cors.New(cors.Options{
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+	}).Handler
 	return handleCORS(handler)
 }
 
@@ -19,8 +21,10 @@ func main() {
 	//dbURL := "172.17.0.2"
 	dbName := "knowledge-hub"
 	dbCollection := "records"
+	fieldCollection := "fields"
 
 	log.SetLevel(log.DebugLevel)
+	log.SetFormatter(&log.JSONFormatter{})
 
 	dbURL := os.Getenv("MONGODB_URI")
 
@@ -29,9 +33,10 @@ func main() {
 	}
 
 	db := &database.MongoDB{
-		URL:        dbURL,
-		Database:   dbName,
-		Collection: dbCollection,
+		URL:             dbURL,
+		Database:        dbName,
+		Collection:      dbCollection,
+		FieldCollection: fieldCollection,
 	}
 
 	var service = &knowledge.WebService{DB: db}

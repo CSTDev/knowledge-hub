@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/cstdev/knowledge-hub/apps/knowledge/types"
+	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 	log "github.com/sirupsen/logrus"
 )
@@ -15,13 +16,17 @@ type Database interface {
 	Search(query types.SearchQuery) ([]types.Record, error)
 	Update(id string, r types.Record) error
 	Delete(id string) error
+	Fields() ([]types.Field, error)
+	UpdateFields(fields []types.Field) error
+	DeleteField(id string) error
 }
 
 // MongoDB provides access and methods to talk to Mongo
 type MongoDB struct {
-	URL        string
-	Database   string
-	Collection string
+	URL             string
+	Database        string
+	Collection      string
+	FieldCollection string
 }
 
 // Create takes a record and writes it to the Mongo database
@@ -72,7 +77,7 @@ func (db *MongoDB) Update(id string, r types.Record) error {
 		return err
 	}
 
-	c := session.DB(db.Database).C(db.Collection)
+	c := session.DB("").C(db.Collection)
 
 	err = c.Update(bson.M{"id": id}, r)
 	if err != nil {
@@ -88,6 +93,83 @@ func (db *MongoDB) Update(id string, r types.Record) error {
 
 // Delete marks the matching record in the database as deleted
 func (db *MongoDB) Delete(id string) error {
+	return nil
+}
+
+// Fields retrieves all the set fields that can be use for entering information
+func (db *MongoDB) Fields() ([]types.Field, error) {
+	session, err := GetSession(db.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	c := session.DB("").C(db.FieldCollection)
+
+	var fields []types.Field
+
+	err = c.Find(bson.M{"deleted": bson.M{"$ne": true}}).All(&fields)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to get the fields from the database.")
+		return nil, err
+	}
+
+	return fields, nil
+}
+
+// UpdateFields writes the fields objects to the database, updating any that already exist.
+func (db *MongoDB) UpdateFields(fields []types.Field) error {
+	session, err := GetSession(db.URL)
+	if err != nil {
+		return err
+	}
+
+	c := session.DB("").C(db.FieldCollection)
+
+	bulk := c.Bulk()
+
+	for _, field := range fields {
+		bulk.Upsert(bson.M{"id": field.ID}, field)
+	}
+
+	_, err = bulk.Run()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to update field in the database.")
+		return err
+	}
+
+	return nil
+}
+
+//DeleteField takes an id of a field and marks it as deleted
+func (db *MongoDB) DeleteField(id string) error {
+
+	session, err := GetSession(db.URL)
+	if err != nil {
+		return err
+	}
+
+	c := session.DB("").C(db.FieldCollection)
+
+	err = c.Update(bson.M{"id": id}, bson.M{"$set": bson.M{"deleted": true}})
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			log.WithFields(log.Fields{
+				"id":    id,
+				"error": err.Error(),
+			}).Warn("Field with id doesn't exist.")
+			return &types.FieldNotFoundError{id, "Field does not exist in the database."}
+		}
+		log.WithFields(log.Fields{
+			"id":    id,
+			"error": err.Error(),
+		}).Error("Failed to delete field in the database.")
+		return err
+	}
+
 	return nil
 }
 
@@ -107,5 +189,13 @@ func (f *FakeDB) Update(id string, r types.Record) error {
 }
 
 func (f *FakeDB) Delete(id string) error {
+	return nil
+}
+
+func (f *FakeDB) Fields() ([]types.Field, error) {
+	return nil, nil
+}
+
+func (f *FakeDB) UpdateFields(fields []types.Field) error {
 	return nil
 }
