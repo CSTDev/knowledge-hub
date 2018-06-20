@@ -24,6 +24,7 @@ func main() {
 	fieldCollection := "fields"
 
 	log.SetLevel(log.DebugLevel)
+	log.SetFormatter(&log.JSONFormatter{})
 
 	dbURL := os.Getenv("MONGODB_URI")
 

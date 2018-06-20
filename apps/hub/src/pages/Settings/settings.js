@@ -87,7 +87,7 @@ class Settings extends Component {
         const item = {
             id: uuid(),
             value: "",
-            order: items.length + 1,
+            order: items.length,
         }
         items.push(item);
         this.setState({
@@ -98,7 +98,7 @@ class Settings extends Component {
     deleteItem = (id) => {
         let itemsArray = [...this.state.items];
         DeleteField(itemsArray[id].id).then(response => {
-            if (!response || response.status !== 200) {
+            if (!response || (response.status !== 200 && response.message !== "404")) {
                 toast("Unable to remove field")
                 return
             } else {
@@ -124,6 +124,7 @@ class Settings extends Component {
                 toast("Failed to save changes")
                 return false
             } else {
+                toast("Fields saved")
                 return true
             }
 

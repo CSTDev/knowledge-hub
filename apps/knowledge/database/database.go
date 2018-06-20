@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/cstdev/knowledge-hub/apps/knowledge/types"
+	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 	log "github.com/sirupsen/logrus"
 )
@@ -155,6 +156,13 @@ func (db *MongoDB) DeleteField(id string) error {
 
 	err = c.Update(bson.M{"id": id}, bson.M{"$set": bson.M{"deleted": true}})
 	if err != nil {
+		if err == mgo.ErrNotFound {
+			log.WithFields(log.Fields{
+				"id":    id,
+				"error": err.Error(),
+			}).Warn("Field with id doesn't exist.")
+			return &types.FieldNotFoundError{id, "Field does not exist in the database."}
+		}
 		log.WithFields(log.Fields{
 			"id":    id,
 			"error": err.Error(),
