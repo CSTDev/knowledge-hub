@@ -3,14 +3,14 @@ import './home.css';
 import 'react-md/dist/react-md.blue_grey-amber.min.css';
 import 'material-icons/iconfont/MaterialIcons-Regular.woff2'
 import 'material-icons/iconfont/material-icons.css'
-import {SearchBar} from '../../components/SearchBar';
-import {DetailsPane} from  '../../components/DetailsPane';
-import {Reports} from '../../data/Reports';
-import {FilterData} from '../../data/Filter';
-import {ReportDialog} from "../../components/ReportDialog/reportDialog";
-import {MapView} from '../../components/Map/map';
-import {VersionBar} from '../../components/VersionBar/versionBar';
-import {CreateRecord, LoadFields} from '../../data/api'
+import { SearchBar } from '../../components/SearchBar';
+import { DetailsPane } from '../../components/DetailsPane';
+import { Reports } from '../../data/Reports';
+import { FilterData } from '../../data/Filter';
+import { ReportDialog } from "../../components/ReportDialog/reportDialog";
+import { MapView } from '../../components/Map/map';
+import { VersionBar } from '../../components/VersionBar/versionBar';
+import { CreateRecord, LoadFields, UpdateRecord } from '../../data/api'
 import { ToastContainer, toast } from 'react-toastify';
 import '../../react-toastify.css';
 import MenuBar from '../../components/MenuBar/menuBar';
@@ -33,17 +33,17 @@ class Home extends Component {
 
   componentDidMount() {
     LoadFields().then((response) => {
-      if(!response || response.status !== 200){
-        
+      if (!response || response.status !== 200) {
+
         return
       }
       response.json().then(json => {
-          return json
-        }).then(fieldList =>{
-          this.setState({fields: fieldList})
-        })
-      
-  });
+        return json
+      }).then(fieldList => {
+        this.setState({ fields: fieldList })
+      })
+
+    });
   }
 
   filterChange(value, event) {
@@ -55,12 +55,15 @@ class Home extends Component {
     });
   }
 
-  viewSummary(){
-    
-    
+  viewSummary() {
+
+
   }
 
   showReport = (report) => {
+    if (!report.details) {
+      report.details = {}
+    }
     this.setState({
       selectedReport: report
     });
@@ -68,72 +71,68 @@ class Home extends Component {
 
   hideReport = (reportToSave) => {
     if (reportToSave) {
-      if (!reportToSave.id){
-                   
+      if (!reportToSave.id) {
         CreateRecord(reportToSave).then((response) => {
-          if(!response || response.status !== 201){
+          if (!response || response.status !== 201) {
             toast("Failed to Save")
             return
           }
           response.json().then(json => {
             return json.ID
-          }).then(id =>{
+          }).then(id => {
             reportToSave.id = id;
 
             let newReports = this.state.reports;
             newReports.push(reportToSave)
-            this.setState({reports: newReports})
-
-            // const reports = _.cloneDeep(this.state.reports);
-            // const reportIndex = _.findIndex(this.state.reports, (report) => {
-            //   return report.title === reportToSave.title;
-            // });
-            // console.log
-            // if (reportIndex !== -1) {
-            //   reports[reportIndex].id = id
-            // }
-            
-            // const filteredReports = FilterData(reports, this.state.filterText, null);
-    
-            // this.setState({reports, filteredReports});
-            // console.log("State after save:")
-            // console.dir(this.state)
+            this.setState({ reports: newReports })
           });
 
           this.setState({
             selectedReport: null
           });
-        })
-        
+        });
+
+      } else {
+        UpdateRecord(reportToSave).then((response) => {
+          if (!response || response.status !== 200) {
+            toast("Failed to Save")
+            return
+          }
+          toast("Saved")
+
+          this.setState({
+            selectedReport: null
+          });
+        });
       }
-    
+
     } else {
       this.setState({
         selectedReport: null
       });
     }
-    
+
   };
 
   render() {
     return (
       <div>
         <ToastContainer />
-        <VersionBar version={this.state.version}/>
+        <VersionBar version={this.state.version} />
         <MenuBar />
         <div className="mapArea">
-          <div className="searchArea" style={{display: this.state.selectedReport ? "none" : "block"}}>
-            <SearchBar value={this.state.filterText} onChange={(value, event) => this.filterChange(value, event)}/>
+          <div className="searchArea" style={{ display: this.state.selectedReport ? "none" : "block" }}>
+            <SearchBar value={this.state.filterText} onChange={(value, event) => this.filterChange(value, event)} />
           </div>
           <div className="mapViewArea">
-            <MapView className="mapView" reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary}/>
+            <MapView className="mapView" reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} />
           </div>
         </div>
         <div className="detailsArea">
-          <DetailsPane reports={this.state.filteredReports} showReport={this.showReport}/>
+          <DetailsPane reports={this.state.filteredReports} showReport={this.showReport} />
         </div>
-        <ReportDialog report={this.state.selectedReport} onHide={this.hideReport} fields={this.state.fields} showFields={this.state.selectedReport ? !this.state.selectedReport.id : false}/>
-        
+        <ReportDialog report={this.state.selectedReport} onHide={this.hideReport} fields={this.state.fields} showFields={this.state.selectedReport ? !this.state.selectedReport.id : false} />
+
       </div>
     );
   }

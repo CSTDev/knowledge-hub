@@ -15,6 +15,23 @@ export function CreateRecord(record) {
         })
 }
 
+export function UpdateRecord(record){
+    return fetch(process.env.REACT_APP_API_URL + '/record/' + record.id, {
+        method:'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(
+            record
+        )
+    }).then(response => {
+        if(!response.ok){
+            throw Error(response.statusText)
+        }
+        return response
+    }).catch(function(){
+        return null
+    })
+}
+
 export function LoadFields(){
     return fetch(process.env.REACT_APP_API_URL + '/field', {
         method: 'GET'
