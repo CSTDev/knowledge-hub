@@ -72,18 +72,10 @@ var jsonReq = []byte(`{
 	  "lng": -1.619060757481970,
 	  "lat": 53.862309546682600
 	},
-	"reports": [
-	  {
-		"reportID": 0,
-		"reportDetails": "that lightsaber times, by but star consists ",
-		"url": "https://example.edu/"
-	  },
-	  {
-		"reportID": 1,
-		"reportDetails": "can the or brightly burn, fictional length).[1] ",
-		"url": "http://example.com/#bat"
-	  }
-	 ]
+	"details":{
+		"Question1":"Who is this?",
+		"Question2":"Why is this?"
+	}
 }`)
 
 func TestNewRecordCallsDatabaseWithRecord(t *testing.T) {
@@ -105,6 +97,30 @@ func TestNewRecordCallsDatabaseWithRecord(t *testing.T) {
 
 	if !called {
 		t.Error("Expected database create method to be called")
+	}
+}
+
+func TestNewRecordCorrectlyParsesUnknownFields(t *testing.T) {
+	correct := false
+	db := mockDB{
+		CreateFunc: func(r types.Record) (string, error) {
+			if r.Details["Question1"] == "Who is this?" && r.Details["Question2"] == "Why is this?" {
+				correct = true
+			}
+			return "ABC123", nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	req, err := http.NewRequest("POST", "/record", bytes.NewBuffer(jsonReq))
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.NewRecord())
+	handler.ServeHTTP(rr, req)
+
+	if !correct {
+		t.Error("Expected record to have Question1 and Question2 fields.")
 	}
 }
 
@@ -241,7 +257,7 @@ func TestSearchReturnsServerErrorWhenDBSearchFails(t *testing.T) {
 }
 
 func TestSuccessfulSearchReturnsResults(t *testing.T) {
-	expectedResults := `[{"id":"","title":"Holy Trinity Church","location":{"lat":53.8623095466826,"lng":-1.61906075748197},"reports":[{"reportID":0,"reportDetails":"that lightsaber times, by but star consists ","url":"https://example.edu/"}]}]`
+	expectedResults := `[{"id":"","title":"Holy Trinity Church","location":{"lat":53.8623095466826,"lng":-1.61906075748197},"details":null}]`
 	db := mockDB{
 		SearchFunc: func(query types.SearchQuery) ([]types.Record, error) {
 			var records []types.Record
