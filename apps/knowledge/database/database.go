@@ -64,7 +64,13 @@ func boundsPresent(query types.SearchQuery) bool {
 
 // Search takes a query and returns all records that match
 func (db *MongoDB) Search(query types.SearchQuery) ([]types.Record, error) {
-	log.Debug("Searching DB")
+	log.WithFields(log.Fields{
+		"query":  query.Query,
+		"minLat": query.MinLat,
+		"maxLat": query.MaxLat,
+		"minLng": query.MinLng,
+		"maxLng": query.MaxLng,
+	}).Debug("Searching DB")
 	session, err := GetSession(db.URL)
 	if err != nil {
 		return nil, err
@@ -73,14 +79,17 @@ func (db *MongoDB) Search(query types.SearchQuery) ([]types.Record, error) {
 
 	var records []types.Record
 
-	if boundsPresent(query) {
+	log.WithFields(log.Fields{
+		"boundsPresent": boundsPresent(query),
+	}).Debug("Checking for bounds")
 
+	if boundsPresent(query) {
 		err = c.Find(bson.M{
 			"location": bson.M{
 				"$geoWithin": bson.M{
 					"$box": []interface{}{
-						[]interface{}{query.MinLat, query.MinLng},
-						[]interface{}{query.MaxLat, query.MaxLng},
+						[]interface{}{query.MinLng, query.MinLat},
+						[]interface{}{query.MaxLng, query.MaxLat},
 					},
 				},
 			},
