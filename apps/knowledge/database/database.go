@@ -36,6 +36,14 @@ func (db *MongoDB) Create(r types.Record) (string, error) {
 		return "", err
 	}
 
+	if len(r.Location.Coordinates) == 0 {
+		r.Location.Coordinates = []float64{r.Location.Lng, r.Location.Lat}
+		r.Location.Type = "Point"
+		log.WithFields(log.Fields{
+			"coordinates": r.Location.Coordinates,
+		}).Debug("Added coordinates for easy searching")
+	}
+
 	//Use DB from URL
 	c := session.DB("").C(db.Collection)
 
@@ -85,7 +93,7 @@ func (db *MongoDB) Search(query types.SearchQuery) ([]types.Record, error) {
 
 	if boundsPresent(query) {
 		err = c.Find(bson.M{
-			"location": bson.M{
+			"location.coordinates": bson.M{
 				"$geoWithin": bson.M{
 					"$box": []interface{}{
 						[]interface{}{query.MinLng, query.MinLat},
@@ -116,6 +124,9 @@ func (db *MongoDB) Update(id string, r types.Record) error {
 		}).Debug("Record ID does not match URL Path ID")
 		return errors.New("Record ID does not match URL Path ID")
 	}
+
+	r.Location.Coordinates = []float64{r.Location.Lng, r.Location.Lat}
+
 	session, err := GetSession(db.URL)
 	if err != nil {
 		return err
