@@ -57,9 +57,44 @@ func (db *MongoDB) Create(r types.Record) (string, error) {
 	return r.ID, nil
 }
 
+func boundsPresent(query types.SearchQuery) bool {
+	log.Debug("Checking bounds exist")
+	return query.MinLat != 0 && query.MaxLat != 0 && query.MinLng != 0 && query.MaxLng != 0
+}
+
 // Search takes a query and returns all records that match
 func (db *MongoDB) Search(query types.SearchQuery) ([]types.Record, error) {
-	return nil, nil
+	log.Debug("Searching DB")
+	session, err := GetSession(db.URL)
+	if err != nil {
+		return nil, err
+	}
+	c := session.DB("").C(db.Collection)
+
+	var records []types.Record
+
+	if boundsPresent(query) {
+
+		err = c.Find(bson.M{
+			"location": bson.M{
+				"$geoWithin": bson.M{
+					"$box": []interface{}{
+						[]interface{}{query.MinLat, query.MinLng},
+						[]interface{}{query.MaxLat, query.MaxLng},
+					},
+				},
+			},
+		}).All(&records)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Failed to get any records from the database.")
+			return nil, err
+		}
+
+	}
+	return records, nil
 }
 
 // Update takes and id of the record to update and a Record object

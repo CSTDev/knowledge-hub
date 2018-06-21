@@ -16,5 +16,9 @@ type Service interface {
 
 // SearchQuery marshalls the query params into a search term
 type SearchQuery struct {
-	Query string
+	Query  string
+	MinLat float64 `qstring:"minLat"`
+	MaxLat float64 `qstring:"maxLat"`
+	MinLng float64 `qstring:"minLng"`
+	MaxLng float64 `qstring:"maxLng"`
 }

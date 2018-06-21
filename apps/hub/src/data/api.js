@@ -1,3 +1,16 @@
+export function GetRecords(bounds){
+    let queryString = "minLat=" + bounds._southWest.lat + "&minLng=" + bounds._southWest.lng + "&maxLat=" + bounds._northEast.lat + "&maxLng=" + bounds._northEast.lng
+    return fetch(process.env.REACT_APP_API_URL + '/record?' + queryString, {
+        method: 'GET'
+    }).then(response => {
+        if(!response.ok)
+            throw Error(response.status)
+        return response
+    }).catch(function(response){
+        return response
+    });
+}
+
 export function CreateRecord(record) {
         return fetch(process.env.REACT_APP_API_URL + '/record', {
             method:'POST',
