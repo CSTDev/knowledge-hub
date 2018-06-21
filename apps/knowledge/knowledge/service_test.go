@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -14,7 +15,15 @@ import (
 
 	"github.com/cstdev/knowledge-hub/apps/knowledge/types"
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
+
+func TestMain(m *testing.M) {
+	log.SetLevel(log.DebugLevel)
+	log.SetFormatter(&log.JSONFormatter{})
+	retCode := m.Run()
+	os.Exit(retCode)
+}
 
 // ok fails the test if an err is not nil.
 func ok(tb testing.TB, err error) {
@@ -204,7 +213,7 @@ func TestSearchWithNoQueryParamsErrors(t *testing.T) {
 func TestSearchQueryTooLong(t *testing.T) {
 	db := mockDB{}
 	service := &WebService{DB: &db}
-	req, err := http.NewRequest("GET", "/record?query=A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20", nil)
+	req, err := http.NewRequest("GET", "/record?query=A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20A%20Really%20long%20query%20&minLat=53.635682044465476&maxLat=53.840373979032805&minLng=-1.9713592529296877&maxLng=-1.1144256591796877", nil)
 	ok(t, err)
 
 	rr := httptest.NewRecorder()
@@ -227,7 +236,7 @@ func TestSearchQueryIsPassedToDB(t *testing.T) {
 
 	expectedQuery := "Leeds"
 
-	req, err := http.NewRequest("GET", "/record?query=Leeds", nil)
+	req, err := http.NewRequest("GET", "/record?query=Leeds&minLat=53.635682044465476&maxLat=53.840373979032805&minLng=-1.9713592529296877&maxLng=-1.1144256591796877", nil)
 	ok(t, err)
 
 	rr := httptest.NewRecorder()
@@ -245,7 +254,7 @@ func TestSearchReturnsServerErrorWhenDBSearchFails(t *testing.T) {
 		},
 	}
 	service := &WebService{DB: &db}
-	req, err := http.NewRequest("GET", "/record?query=Leeds", nil)
+	req, err := http.NewRequest("GET", "/record?query=Leeds&minLat=53.635682044465476&maxLat=53.840373979032805&minLng=-1.9713592529296877&maxLng=-1.1144256591796877", nil)
 	ok(t, err)
 
 	rr := httptest.NewRecorder()
@@ -257,7 +266,7 @@ func TestSearchReturnsServerErrorWhenDBSearchFails(t *testing.T) {
 }
 
 func TestSuccessfulSearchReturnsResults(t *testing.T) {
-	expectedResults := `[{"id":"","title":"Holy Trinity Church","location":{"lat":53.8623095466826,"lng":-1.61906075748197},"details":null}]`
+	expectedResults := `[{"id":"","title":"Holy Trinity Church","location":{"type":"","Coordinates":null,"lat":53.8623095466826,"lng":-1.61906075748197},"details":null}]`
 	db := mockDB{
 		SearchFunc: func(query types.SearchQuery) ([]types.Record, error) {
 			var records []types.Record
@@ -268,7 +277,7 @@ func TestSuccessfulSearchReturnsResults(t *testing.T) {
 		},
 	}
 	service := &WebService{DB: &db}
-	req, err := http.NewRequest("GET", "/record?query=Leeds", nil)
+	req, err := http.NewRequest("GET", "/record?query=Leeds&minLat=53.635682044465476&maxLat=53.840373979032805&minLng=-1.9713592529296877&maxLng=-1.1144256591796877", nil)
 	ok(t, err)
 
 	rr := httptest.NewRecorder()
@@ -293,7 +302,7 @@ func TestSearchReturnsNotFoundOnNoResults(t *testing.T) {
 		},
 	}
 	service := &WebService{DB: &db}
-	req, err := http.NewRequest("GET", "/record?query=Leeds", nil)
+	req, err := http.NewRequest("GET", "/record?query=Leeds&minLat=53.635682044465476&maxLat=53.840373979032805&minLng=-1.9713592529296877&maxLng=-1.1144256591796877", nil)
 	ok(t, err)
 
 	rr := httptest.NewRecorder()
@@ -306,6 +315,96 @@ func TestSearchReturnsNotFoundOnNoResults(t *testing.T) {
 
 	if rr.Code != 404 {
 		t.Errorf("Expected Success (404) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestSearchCanTakeMapBounds(t *testing.T) {
+	var passedQuery types.SearchQuery
+	db := mockDB{
+		SearchFunc: func(s types.SearchQuery) ([]types.Record, error) {
+			passedQuery = s
+			return []types.Record{}, nil
+		},
+	}
+	service := &WebService{DB: &db}
+
+	expectedBounds := &types.SearchQuery{
+		MinLat: 53.635682044465476,
+		MaxLat: 53.840373979032805,
+		MinLng: -1.9713592529296877,
+		MaxLng: -1.1144256591796877,
+	}
+
+	req, err := http.NewRequest("GET", "/record?minLat=53.635682044465476&maxLat=53.840373979032805&minLng=-1.9713592529296877&maxLng=-1.1144256591796877", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if passedQuery.MinLat != expectedBounds.MinLat {
+		t.Errorf("Expected min Lat coordinates: %v \n but got: %v\n", expectedBounds.MinLat, passedQuery.MinLat)
+	}
+
+	if passedQuery.MaxLat != expectedBounds.MaxLat {
+		t.Errorf("Expected max Lat coordinates: %v \n but got: %v\n", expectedBounds.MaxLat, passedQuery.MaxLat)
+	}
+
+	if passedQuery.MinLng != expectedBounds.MinLng {
+		t.Errorf("Expected min lng coordinates: %v \n but got: %v\n", expectedBounds.MinLng, passedQuery.MinLng)
+	}
+
+	if passedQuery.MaxLng != expectedBounds.MaxLng {
+		t.Errorf("Expected max lng coordinates: %v \n but got: %v\n", expectedBounds.MaxLng, passedQuery.MaxLng)
+	}
+}
+
+func TestIfBoundsAreNotProvidedErrorIsReturned(t *testing.T) {
+	db := mockDB{}
+	service := &WebService{DB: &db}
+	req, err := http.NewRequest("GET", "/record?query=Leeds", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestMinLatCannotBeGreaterThanMaxLatReturnsError(t *testing.T) {
+	db := mockDB{
+		SearchFunc: func(s types.SearchQuery) ([]types.Record, error) {
+			return []types.Record{}, nil
+		},
+	}
+	service := &WebService{DB: &db}
+	req, err := http.NewRequest("GET", "/record?minLat=53.840373979032805&maxLat=53.635682044465476&minLng=-1.9713592529296877&maxLng=-1.1144256591796877", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
+	}
+}
+
+func TestMinLngCannotBeGreaterThanMaxLngReturnsError(t *testing.T) {
+	db := mockDB{
+		SearchFunc: func(s types.SearchQuery) ([]types.Record, error) {
+			return []types.Record{}, nil
+		},
+	}
+	service := &WebService{DB: &db}
+	req, err := http.NewRequest("GET", "/record?minLat=53.635682044465476&maxLat=53.840373979032805&minLng=-1.1144256591796877&maxLng=-1.9713592529296877", nil)
+	ok(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(service.Search())
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("Expected Bad Request (400) status to be returned got %d", rr.Code)
 	}
 }
 

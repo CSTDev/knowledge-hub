@@ -1,0 +1,442 @@
+{
+  "id": "1",
+  "title": "Holy Trinity Church",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.619060757481970,
+      53.862309546682600
+    ],
+    "lng": -1.619060757481970,
+    "lat": 53.862309546682600
+  }
+}
+{
+  "id": "2",
+  "title": "Adel Methodist Church Hall",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.593298176150450,
+      53.856553683013900
+    ],
+    "lng": -1.593298176150450,
+    "lat": 53.856553683013900
+  }
+}
+{
+  "id": "3",
+  "title": "Holy Trinity C of E Primary School",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.621931650684400,
+      53.859253737305600
+    ],
+    "lng": -1.621931650684400,
+    "lat": 53.859253737305600
+  }
+}
+{
+  "id": "4",
+  "title": "Holt Park Active",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.607800118137020,
+      53.855740000000000
+    ],
+    "lng": -1.607800118137020,
+    "lat": 53.855740000000000
+  }
+}
+{
+  "id": "5",
+  "title": "Adel Memorial Hall",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.587123901914960,
+      53.855193410998400
+    ],
+    "lng": -1.587123901914960,
+    "lat": 53.855193410998400
+  }
+}
+{
+  "id": "6",
+  "title": "Adel St John The Baptist C of E Primary School",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.581864000000000,
+      53.850619000000000
+    ],
+    "lng": -1.581864000000000,
+    "lat": 53.850619000000000
+  }
+}
+{
+  "id": "7",
+  "title": "Old Pool Bank Village Hall",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.644098302564380,
+      53.893412538482000
+    ],
+    "lng": -1.644098302564380,
+    "lat": 53.893412538482000
+  }
+}
+{
+  "id": "8",
+  "title": "Pool In Wharfedale Village Memorial Hall",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.624836571149610,
+      53.901658724367000
+    ],
+    "lng": -1.624836571149610,
+    "lat": 53.901658724367000
+  }
+}
+{
+  "id": "9",
+  "title": "Wigton Moor United Reformed Church",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.519309444740910,
+      53.856136491444500
+    ],
+    "lng": -1.519309444740910,
+    "lat": 53.856136491444500
+  }
+}
+  {
+  "id": "10",
+  "title": "Charlie Bretts At The Allerton",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.543827000000000,
+      53.852279805514400
+    ],
+    "lng": -1.543827000000000,
+    "lat": 53.852279805514400
+  }
+}
+  {
+  "id": "11",
+  "title": "Tree Tops Community Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.521085452363010,
+      53.851047410664900
+    ],
+    "lng": -1.521085452363010,
+    "lat": 53.851047410664900
+  }
+}
+  {
+  "id": "12",
+  "title": "Tree Tops Community Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.521085452363010,
+      53.851047410664900
+    ],
+    "lng": -1.521085452363010,
+    "lat": 53.851047410664900
+  }
+}
+  {
+  "id": "13",
+  "title": "Lord D'Arcy Public House",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.530208085264650,
+      53.856305457705300
+    ],
+    "lng": -1.530208085264650,
+    "lat": 53.856305457705300
+  }
+}
+  {
+  "id": "14",
+  "title": "St John's Church Hall",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.535025000000000,
+      53.849656000000000
+    ],
+    "lng": -1.535025000000000,
+    "lat": 53.849656000000000
+  }
+}
+  {
+  "id": "15",
+  "title": "Alwoodley Primary School",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.556075773153940,
+      53.850572000000000
+    ],
+    "lng": -1.556075773153940,
+    "lat": 53.850572000000000
+  }
+}
+  {
+  "id": "16",
+  "title": "Moortown Methodist Church Hall",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.559888242380940,
+      53.844338093517500
+    ],
+    "lng": -1.559888242380940,
+    "lat": 53.844338093517500
+  }
+}
+  {
+  "id": "17",
+  "title": "Alwoodley Community Association",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.554911236488480,
+      53.859338622661200
+    ],
+    "lng": -1.554911236488480,
+    "lat": 53.859338622661200
+  }
+}
+  {
+  "id": "18",
+  "title": "The Old Halfway House",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.508069000000000,
+      53.741098290480500
+    ],
+    "lng": -1.508069000000000,
+    "lat": 53.741098290480500
+  }
+}
+  {
+  "id": "19",
+  "title": "Lofthouse Community Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.501960624733950,
+      53.731958596112500
+    ],
+    "lng": -1.501960624733950,
+    "lat": 53.731958596112500
+  }
+}
+  {
+  "id": "20",
+  "title": "Methodist Schoolroom",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.496362961417380,
+      53.727243394104200
+    ],
+    "lng": -1.496362961417380,
+    "lat": 53.727243394104200
+  }
+}
+  {
+  "id": "21",
+  "title": "Thorpe Community Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.526484168162810,
+      53.732165804458200
+    ],
+    "lng": -1.526484168162810,
+    "lat": 53.732165804458200
+  }
+}
+{
+  "id": "22",
+  "title": "Thorpe Social Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.531987122266040,
+      53.737580293275000
+    ],
+    "lng": -1.531987122266040,
+    "lat": 53.737580293275000
+  }
+}
+  {
+  "id": "23",
+  "title": "Christ Church Hall",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.496436099059490,
+      53.730003067762100
+    ],
+    "lng": -1.496436099059490,
+    "lat": 53.730003067762100
+  }
+}
+  {
+  "id": "24",
+  "title": "Tingley Youth & Community Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.564494713008940,
+      53.728364084777200
+    ],
+    "lng": -1.564494713008940,
+    "lat": 53.728364084777200
+  }
+}
+  {
+  "id": "25",
+  "title": "West Ardsley Community Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.577163397322840,
+      53.714999115144500
+    ],
+    "lng": -1.577163397322840,
+    "lat": 53.714999115144500
+  }
+}
+  {
+  "id": "26",
+  "title": "Tingley Athletics Club",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.551029993238790,
+      53.730300805463300
+    ],
+    "lng": -1.551029993238790,
+    "lat": 53.730300805463300
+  }
+}
+  {
+  "id": "27",
+  "title": "St Michael's Parish Hall",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.543731053256380,
+      53.722651304380900
+    ],
+    "lng": -1.543731053256380,
+    "lat": 53.722651304380900
+  }
+}
+  {
+  "id": "28",
+  "title": "St Gabriels Community Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.532492408309690,
+      53.727560483504800
+    ],
+    "lng": -1.532492408309690,
+    "lat": 53.727560483504800
+  }
+}
+  {
+  "id": "29",
+  "title": "Northfields Community Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.501497521504950,
+      53.745483833197700
+    ],
+    "lng": -1.501497521504950,
+    "lat": 53.745483833197700
+  }
+}
+  {
+  "id": "30",
+  "title": "Tingley Youth & Community Centre",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.564494713008940,
+      53.728364084777200
+    ],
+    "lng": -1.564494713008940,
+    "lat": 53.728364084777200
+  }
+}
+ {
+  "id": "31",
+  "title": "The Apostolic Church",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.606605192833640,
+      53.810660516345800
+    ],
+    "lng": -1.606605192833640,
+    "lat": 53.810660516345800
+  }
+}
+  {
+  "id": "32",
+  "title": "Portable building at the junction of",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.60946402438009,
+      53.805348953790500
+    ],
+    "lng": -1.609464024380090,
+    "lat": 53.805348953790500
+  }
+}
+  {
+  "id": "32",
+  "title": "Armley Primary School",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.588386643750430,
+      53.800820462506500
+    ],
+    "lng": -1.588386643750430,
+    "lat": 53.800820462506500
+  }
+}
+  {
+  "id": "34",
+  "title": "Holy Family R C Primary School",
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      -1.581010532627160,
+      53.795968366659900
+    ],
+    "lng": -1.581010532627160,
+    "lat": 53.795968366659900
+  }
+}

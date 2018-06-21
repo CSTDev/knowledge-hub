@@ -5,12 +5,11 @@ import 'material-icons/iconfont/MaterialIcons-Regular.woff2'
 import 'material-icons/iconfont/material-icons.css'
 import { SearchBar } from '../../components/SearchBar';
 import { DetailsPane } from '../../components/DetailsPane';
-import { Reports } from '../../data/Reports';
 import { FilterData } from '../../data/Filter';
 import { ReportDialog } from "../../components/ReportDialog/reportDialog";
 import { MapView } from '../../components/Map/map';
 import { VersionBar } from '../../components/VersionBar/versionBar';
-import { CreateRecord, LoadFields, UpdateRecord } from '../../data/api'
+import { CreateRecord, GetRecords, LoadFields, UpdateRecord } from '../../data/api'
 import { ToastContainer, toast } from 'react-toastify';
 import '../../react-toastify.css';
 import MenuBar from '../../components/MenuBar/menuBar';
@@ -23,8 +22,8 @@ class Home extends Component {
 
     this.state = {
       filterText: "",
-      reports: Reports,
-      filteredReports: Reports,
+      reports: [],
+      filteredReports: [],
       selectedReport: null,
       version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
       fields: []
@@ -58,6 +57,24 @@ class Home extends Component {
   viewSummary() {
 
 
+  }
+
+  getRecords = (bounds) => {
+    let records = GetRecords(bounds).then(response => {
+      if (!response || (response.status !== 200)) {
+        if (response.message && response.message == "404"){
+          this.setState({reports: [], filteredReports:[]});
+          return
+        }
+        toast("Failed to load records");
+        return;
+      }
+      response.json().then(json => {
+        return json;
+      }).then(records => {
+        this.setState({reports: records, filteredReports:records});
+      });
+    });    
   }
 
   showReport = (report) => {
@@ -125,7 +142,7 @@ class Home extends Component {
             <SearchBar value={this.state.filterText} onChange={(value, event) => this.filterChange(value, event)} />
           </div>
           <div className="mapViewArea">
-            <MapView className="mapView" reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} />
+            <MapView className="mapView" reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} getRecords={this.getRecords}/>
           </div>
         </div>
         <div className="detailsArea">

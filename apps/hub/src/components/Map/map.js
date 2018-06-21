@@ -29,6 +29,19 @@ export class MapView extends React.Component {
       lng: -1.5491,
       zoom: 11
     }
+    this.map = React.createRef();
+  }
+
+  componentDidMount = () => {
+    if (this.map.current.leafletElement){
+      this.props.getRecords(this.map.current.leafletElement.getBounds());
+    }
+  }
+
+  updateRecordsBounds = () =>{
+    if (this.map.current.leafletElement){
+      this.props.getRecords(this.map.current.leafletElement.getBounds());
+    }
   }
 
   newPoint = (e) => {
@@ -47,7 +60,7 @@ export class MapView extends React.Component {
 
     return (
       <div className="mapContainer">
-          <Map center={position} zoom={this.state.zoom} oncontextmenu={this.newPoint}>
+          <Map center={position} zoom={this.state.zoom} oncontextmenu={this.newPoint} ref={this.map} onzoomend={() => this.updateRecordsBounds()} onmoveend={() => this.updateRecordsBounds()}>
             <TileLayer
               url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -61,7 +74,9 @@ export class MapView extends React.Component {
 
 function MarkerGroup(props){
   const reports = props.reports;
-  const markers = reports.map((report, index)=>{
+  let markers = ""
+  if(reports.length > 0){
+  markers = reports.map((report, index)=>{
     return (<Marker position={report.location} key={index}>
         <Popup >
         <div className="summary">
@@ -75,6 +90,7 @@ function MarkerGroup(props){
       </Marker>)
   }
   );
+}
   return (
     <MarkerClusterGroup zoomToBoundsOnClick={false} onClusterClick={()=>props.viewSummary()}>{markers}</MarkerClusterGroup>
   )

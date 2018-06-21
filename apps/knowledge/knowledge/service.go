@@ -112,8 +112,13 @@ func (s *WebService) NewRecord() http.HandlerFunc {
 // as a URL query parameter.
 // Path: /record
 // Method: GET
-// Parameters: query
-// Example: /record?query=Leeds
+// Parameters:
+//		query - string to search for
+//		minLat - minimum latitude of the location
+//		maxLat - maximum latitude of the location
+//		minLng - mininum longitude of the location
+//		maxLng - maximum longitude of the location
+// Example: /record?query=Leeds&minLat=-1.23423423&maxLat=0.12321321&minLng=54.4564523&maxLng=55.2342809
 func (s *WebService) Search() http.HandlerFunc {
 	logger := log.WithFields(log.Fields{
 		"event": "search",
@@ -136,6 +141,10 @@ func (s *WebService) Search() http.HandlerFunc {
 
 		err := qstring.Unmarshal(r.URL.Query(), query)
 
+		logger.WithFields(log.Fields{
+			"value": query,
+		}).Debug("Unmarshalled query params")
+
 		if err != nil {
 			logger.WithFields(log.Fields{
 				"status": 400,
@@ -144,6 +153,15 @@ func (s *WebService) Search() http.HandlerFunc {
 
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Unable to parse search parameters"})
+			return
+		}
+
+		if !boundsPresent(*query) {
+			logger.WithFields(log.Fields{
+				"status": 400,
+			}).Error("No location bounds provided")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(&ErrorResponse{Message: "Not all location bounds provided, expected mininum and maximum latitude and longitude."})
 			return
 		}
 
@@ -179,8 +197,8 @@ func (s *WebService) Search() http.HandlerFunc {
 		}
 
 		logger.WithFields(log.Fields{
-			"status":   200,
-			"response": records,
+			"status":         200,
+			"numberReturned": len(records),
 		}).Info("Results returned")
 		json.NewEncoder(w).Encode(records)
 	}
@@ -497,4 +515,11 @@ func getRecordID(r *http.Request) (string, error) {
 	// }
 
 	return strID, nil
+}
+
+func boundsPresent(query types.SearchQuery) bool {
+	if query.MinLat >= query.MaxLat || query.MinLng >= query.MaxLng {
+		return false
+	}
+	return query.MinLat != 0 && query.MaxLat != 0 && query.MinLng != 0 && query.MaxLng != 0
 }

@@ -36,6 +36,14 @@ func (db *MongoDB) Create(r types.Record) (string, error) {
 		return "", err
 	}
 
+	if len(r.Location.Coordinates) == 0 {
+		r.Location.Coordinates = []float64{r.Location.Lng, r.Location.Lat}
+		r.Location.Type = "Point"
+		log.WithFields(log.Fields{
+			"coordinates": r.Location.Coordinates,
+		}).Debug("Added coordinates for easy searching")
+	}
+
 	//Use DB from URL
 	c := session.DB("").C(db.Collection)
 
@@ -57,9 +65,53 @@ func (db *MongoDB) Create(r types.Record) (string, error) {
 	return r.ID, nil
 }
 
+func boundsPresent(query types.SearchQuery) bool {
+	log.Debug("Checking bounds exist")
+	return query.MinLat != 0 && query.MaxLat != 0 && query.MinLng != 0 && query.MaxLng != 0
+}
+
 // Search takes a query and returns all records that match
 func (db *MongoDB) Search(query types.SearchQuery) ([]types.Record, error) {
-	return nil, nil
+	log.WithFields(log.Fields{
+		"query":  query.Query,
+		"minLat": query.MinLat,
+		"maxLat": query.MaxLat,
+		"minLng": query.MinLng,
+		"maxLng": query.MaxLng,
+	}).Debug("Searching DB")
+	session, err := GetSession(db.URL)
+	if err != nil {
+		return nil, err
+	}
+	c := session.DB("").C(db.Collection)
+
+	var records []types.Record
+
+	log.WithFields(log.Fields{
+		"boundsPresent": boundsPresent(query),
+	}).Debug("Checking for bounds")
+
+	if boundsPresent(query) {
+		err = c.Find(bson.M{
+			"location.coordinates": bson.M{
+				"$geoWithin": bson.M{
+					"$box": []interface{}{
+						[]interface{}{query.MinLng, query.MinLat},
+						[]interface{}{query.MaxLng, query.MaxLat},
+					},
+				},
+			},
+		}).All(&records)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Failed to get any records from the database.")
+			return nil, err
+		}
+
+	}
+	return records, nil
 }
 
 // Update takes and id of the record to update and a Record object
@@ -72,6 +124,9 @@ func (db *MongoDB) Update(id string, r types.Record) error {
 		}).Debug("Record ID does not match URL Path ID")
 		return errors.New("Record ID does not match URL Path ID")
 	}
+
+	r.Location.Coordinates = []float64{r.Location.Lng, r.Location.Lat}
+
 	session, err := GetSession(db.URL)
 	if err != nil {
 		return err

@@ -8,6 +8,8 @@ type Record struct {
 }
 
 type location struct {
-	Lat float64 `json:"lat"`
-	Lng float64 `json:"lng"`
+	Type        string    `json:"type"`
+	Coordinates []float64 `json:"coordinates`
+	Lat         float64   `json:"lat"`
+	Lng         float64   `json:"lng"`
 }

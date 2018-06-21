@@ -25,10 +25,14 @@ yarn-error.log*
 **/vendor/*
 
 # executables
-*.exe
+**/*.exe
+**/main
+apps/knowledge/main.exe~
 
 # vscode
 **/.vscode
 
 # Go SymLinks
 /knowledge
+
+
