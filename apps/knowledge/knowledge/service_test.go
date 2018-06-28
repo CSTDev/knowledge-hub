@@ -266,7 +266,7 @@ func TestSearchReturnsServerErrorWhenDBSearchFails(t *testing.T) {
 }
 
 func TestSuccessfulSearchReturnsResults(t *testing.T) {
-	expectedResults := `[{"id":"","title":"Holy Trinity Church","location":{"type":"","Coordinates":null,"lat":53.8623095466826,"lng":-1.61906075748197},"details":null}]`
+	expectedResults := `[{"id":"","title":"Holy Trinity Church","location":{"type":"","Coordinates":null,"lat":53.8623095466826,"lng":-1.61906075748197},"shortName":"","details":null}]`
 	db := mockDB{
 		SearchFunc: func(query types.SearchQuery) ([]types.Record, error) {
 			var records []types.Record
