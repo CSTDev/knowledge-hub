@@ -11,7 +11,7 @@
     float: right;
     margin-right: 16px
 }
-.country, .description, .locationTitle, .location, shortName{
+.country, .description, .locationTitle, .location, shortName, .facilities{
     margin: 8px
 }
 
@@ -31,6 +31,6 @@
     margin-bottom: 8px;
 }
 
-.country, .description{
+.country, .description, .facilities{
     width: 95%;
 }

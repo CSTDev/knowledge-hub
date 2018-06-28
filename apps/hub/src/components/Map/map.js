@@ -81,6 +81,7 @@ function MarkerGroup(props){
         <Popup >
         <div className="summary">
           <h4>{report.title}</h4>
+            Facilities: {report.facilities && report.facilities.length > 0 ? report.facilities.join(", ") : "None"}<br/>
             Description: {report.details ? report.details.description :""}<br/>
             <div class="buttonHolder">
               <Button raised onClick={()=>props.view(report)}>View</Button>

@@ -1,11 +1,12 @@
 package types
 
 type Record struct {
-	ID        string                 `json:"id"`
-	Title     string                 `json:"title"`
-	Location  location               `json:"location"`
-	ShortName string                 `json:"shortName"`
-	Details   map[string]interface{} `json:"details"`
+	ID         string                 `json:"id"`
+	Title      string                 `json:"title"`
+	Location   location               `json:"location"`
+	ShortName  string                 `json:"shortName"`
+	Facilities []string               `json:"facilities"`
+	Details    map[string]interface{} `json:"details"`
 }
 
 type location struct {
