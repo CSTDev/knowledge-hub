@@ -62,8 +62,8 @@ class Home extends Component {
   getRecords = (bounds) => {
     let records = GetRecords(bounds).then(response => {
       if (!response || (response.status !== 200)) {
-        if (response.message && response.message == "404"){
-          this.setState({reports: [], filteredReports:[]});
+        if (response.message && response.message == "404") {
+          this.setState({ reports: [], filteredReports: [] });
           return
         }
         toast("Failed to load records");
@@ -72,9 +72,12 @@ class Home extends Component {
       response.json().then(json => {
         return json;
       }).then(records => {
-        this.setState({reports: records, filteredReports:records});
+        this.setState({ reports: records });
+
+        this.filterChange(this.state.filterText)
+
       });
-    });    
+    });
   }
 
   showReport = (report) => {
@@ -142,11 +145,11 @@ class Home extends Component {
             <SearchBar value={this.state.filterText} onChange={(value, event) => this.filterChange(value, event)} />
           </div>
           <div className="mapViewArea">
-            <MapView className="mapView" reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} getRecords={this.getRecords}/>
+            <MapView className="mapView" reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} getRecords={this.getRecords} />
           </div>
         </div>
         <div className="detailsArea">
-          <DetailsPane reports={this.state.filteredReports} showReport={this.showReport} />
+          <DetailsPane reports={this.state.filteredReports} showReport={this.showReport} filterTerm={this.state.filterText} />
         </div>
         <ReportDialog report={this.state.selectedReport} onHide={this.hideReport} fields={this.state.fields} showFields={this.state.selectedReport ? !this.state.selectedReport.id : false} />
 

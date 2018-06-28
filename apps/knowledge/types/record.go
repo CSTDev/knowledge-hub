@@ -14,4 +14,5 @@ type location struct {
 	Coordinates []float64 `json:"coordinates`
 	Lat         float64   `json:"lat"`
 	Lng         float64   `json:"lng"`
+	Country     string    `json:"country"`
 }

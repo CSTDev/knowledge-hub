@@ -11,7 +11,11 @@ import * as _ from 'lodash';
  */
 export function FilterData(reports, filterText, mapBounds) {
   const reportsMatchingTextFilter = _.filter(reports, report => {
-    if (report.title.includes(filterText) || report.shortName.includes(filterText)) {
+
+
+    if (report.title.includes(filterText) || report.shortName.includes(filterText) || _.some(report.facilities, facility => {
+      return facility.includes(filterText);
+    }))  {
       return true;
     }
 

@@ -54,7 +54,13 @@ export class ReportDialog extends React.Component {
       }
     }
 
-    if (field === "title" || field === "country" || field === "facilities") {
+    if (field === "country"){
+      report.location[field] = value;
+      this.setState({ report, changed: true });
+      return;
+    }
+
+    if (field === "title" || field === "facilities") {
       report[field] = value;
     } else {
       report.details[field] = value;
@@ -147,7 +153,7 @@ export class ReportDialog extends React.Component {
             className="country"
             label="Location/Country"
             id="country"
-            defaultValue={report.country ? report.country : ""}
+            defaultValue={report.location.country ? report.location.country : ""}
             onChange={this.onValueChange.bind(this, "country")}
           />
           <TextField
