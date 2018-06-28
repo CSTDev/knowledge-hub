@@ -12,7 +12,8 @@ export class ReportDialog extends React.Component {
       report: null,
       changed: false,
       showAll: false,
-      fields: []
+      fields: [],
+      shortNameError: false
     }
   }
 
@@ -37,12 +38,26 @@ export class ReportDialog extends React.Component {
   onValueChange = (field, value, e) => {
     let report = this.state.report;
     field = this.fieldToKey(field);
+    
+    if(field === "shortName"){
+      const shortNameRegex = /^[A-Z]{3}\s[0-9]{2}$/;
+      const isValid = shortNameRegex.test(value);
+      if (value !== "" && !isValid){
+        this.setState({shortNameError: true});
+        return;
+      }else{
+        report[field] = value;
+        this.setState({ report, changed: true, shortNameError: false });
+        return;
+      }
+    }
+    
     if (field === "title" || field === "country") {
-      report[field] = value
+      report[field] = value;
     } else {
       report.details[field] = value;
     }
-    this.setState({ report, changed: true });
+    this.setState({ report, changed: true});
   };
 
 
@@ -64,7 +79,7 @@ export class ReportDialog extends React.Component {
           colored
           title="Location details"
           nav={<Button icon onClick={() => this.props.onHide(null)}>close</Button>}
-          actions={<Button flat onClick={() => this.props.onHide(report)}>Save</Button>}
+          actions={<Button flat onClick={() => this.props.onHide(report)} disabled={this.state.shortNameError}>Save</Button>}
         />
         <Paper className="fillParent md-toolbar-relative" zDepth={1}>
           <SelectionControl
@@ -85,6 +100,15 @@ export class ReportDialog extends React.Component {
             id="locationTitle"
             defaultValue={report.title ? report.title : ""}
             onChange={this.onValueChange.bind(this, "title")}
+          />
+          <TextField
+            className="shortName dataInput"
+            label="Short Name"
+            id="shortName"
+            defaultValue={report.shortName ? report.shortName : ""}
+            onChange={this.onValueChange.bind(this, "shortName")}
+            error={this.state.shortNameError}
+            errorText="Short name should be in format LLL NN."
           />
           <TextField
             className="country"
