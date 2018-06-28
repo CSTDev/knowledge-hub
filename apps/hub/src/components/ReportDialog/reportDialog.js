@@ -2,6 +2,8 @@ import React from 'react'
 import { DialogContainer, Toolbar, Button, Paper, Divider, TextField, SelectionControl } from 'react-md';
 import { formatLatitude, formatLongitude } from 'latlon-formatter';
 
+import FacilityChip from './facilityChip';
+
 
 import './reportDialog.css'
 
@@ -13,7 +15,7 @@ export class ReportDialog extends React.Component {
       changed: false,
       showAll: false,
       fields: [],
-      shortNameError: false
+      shortNameError: false,
     }
   }
 
@@ -38,27 +40,62 @@ export class ReportDialog extends React.Component {
   onValueChange = (field, value, e) => {
     let report = this.state.report;
     field = this.fieldToKey(field);
-    
-    if(field === "shortName"){
+
+    if (field === "shortName") {
       const shortNameRegex = /^[A-Z]{3}\s[0-9]{2}$/;
       const isValid = shortNameRegex.test(value);
-      if (value !== "" && !isValid){
-        this.setState({shortNameError: true});
+      if (value !== "" && !isValid) {
+        this.setState({ shortNameError: true });
         return;
-      }else{
+      } else {
         report[field] = value;
         this.setState({ report, changed: true, shortNameError: false });
         return;
       }
     }
-    
-    if (field === "title" || field === "country") {
+
+    if (field === "country"){
+      report.location[field] = value;
+      this.setState({ report, changed: true });
+      return;
+    }
+
+    if (field === "title" || field === "facilities") {
       report[field] = value;
     } else {
       report.details[field] = value;
     }
-    this.setState({ report, changed: true});
+    this.setState({ report, changed: true });
   };
+
+  removeFacility = (facility) => {
+    let report = this.state.report;
+    const facilities = report.facilities.slice();
+
+    facilities.splice(facilities.indexOf(facility), 1);
+    report.facilities = facilities;
+    this.setState({ report })
+  }
+
+  addFacilityOnTab = (e) => {
+    e.keyCode = 9;
+    this.addFacility(e)
+  }
+
+  addFacility = (e) => {
+    if (e.key === 'Enter' || e.keyCode === 9 || e.key === ' ') {
+      const value = e.target.value.trim().toUpperCase();
+      if (value != "") {
+        e.target.value = "";
+
+        let report = this.state.report;
+        let facilities = report.facilities ? report.facilities : []
+        facilities.push(value)
+        report.facilities = facilities;
+        this.setState({ report })
+      }
+    }
+  }
 
 
   render() {
@@ -68,6 +105,8 @@ export class ReportDialog extends React.Component {
       const report = this.props.report;
       const lat = formatLatitude(report.location.lat, { degrees: true });
       const lng = formatLongitude(report.location.lng, { degrees: true });
+      const facilities = this.state.report ? this.state.report.facilities : [];
+      const chips = facilities && facilities.length > 0 ? facilities.map(facility => <FacilityChip key={facility} name={facility} onClick={() => this.removeFacility(facility)} />) : ""
 
       return <DialogContainer visible={report !== null}
         id="locationDialog"
@@ -114,7 +153,7 @@ export class ReportDialog extends React.Component {
             className="country"
             label="Location/Country"
             id="country"
-            defaultValue={report.country ? report.country : ""}
+            defaultValue={report.location.country ? report.location.country : ""}
             onChange={this.onValueChange.bind(this, "country")}
           />
           <TextField
@@ -123,6 +162,14 @@ export class ReportDialog extends React.Component {
             id="description"
             defaultValue={report.details.description ? report.details.description : ""}
             onChange={this.onValueChange.bind(this, "description")}
+          />
+          {chips}
+          <TextField
+            className="facilities"
+            label="Facilities"
+            id="facilities"
+            onBlur={this.addFacilityOnTab.bind(this)}
+            onKeyUp={this.addFacility.bind(this)}
           />
           <Divider />
           {[].concat(this.props.fields)
