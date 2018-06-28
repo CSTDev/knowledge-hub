@@ -1,5 +1,5 @@
 import React from 'react'
-import { Marker, Map, Popup, TileLayer} from 'react-leaflet';
+import { Marker, Map, Popup, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css'
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import './map.css'
@@ -20,26 +20,44 @@ _.once(() => {
   });
 })();
 
+const DEFAULT_ZOOM = 15;
 
 export class MapView extends React.Component {
-   constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
-      lat: 53.8008,
-      lng: -1.5491,
-      zoom: 11
+      lat: this.props.centre.lat,
+      lng: this.props.centre.lng,
+      zoom: this.props.zoom
     }
     this.map = React.createRef();
   }
 
-  componentDidMount = () => {
-    if (this.map.current.leafletElement){
-      this.props.getRecords(this.map.current.leafletElement.getBounds());
-    }
+  panMap = (lat, lng) => {
+    this.map.current.leafletElement.setView({ "lat": lat, "lng": lng }, DEFAULT_ZOOM);
+
+    // TODO This sort of works, except the popup flashes and there's a couple warnings in the console
+
+    //   for (let key in this.map.current.leafletElement._layers){
+    //     const marker = this.map.current.leafletElement._layers[key]
+    //     if (marker._latlng && (marker._latlng.lat == lat && marker._latlng.lng ==lng)){
+    //       this.map.current.leafletElement._layers[key].openPopup()
+    //       return;
+    //     }
+    // }
+
+
   }
 
-  updateRecordsBounds = () =>{
-    if (this.map.current.leafletElement){
+  componentDidMount = () => {
+    if (this.map.current.leafletElement) {
+      this.props.getRecords(this.map.current.leafletElement.getBounds());
+    }
+
+  }
+
+  updateRecordsBounds = () => {
+    if (this.map.current.leafletElement) {
       this.props.getRecords(this.map.current.leafletElement.getBounds());
     }
   }
@@ -60,39 +78,39 @@ export class MapView extends React.Component {
 
     return (
       <div className="mapContainer">
-          <Map center={position} zoom={this.state.zoom} oncontextmenu={this.newPoint} ref={this.map} onzoomend={() => this.updateRecordsBounds()} onmoveend={() => this.updateRecordsBounds()}>
-            <TileLayer
-              url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <MarkerGroup reports={this.props.reports} view={this.props.view} viewSummary={this.props.viewSummary}/>
-          </Map>
+        <Map center={position} zoom={this.state.zoom} oncontextmenu={this.newPoint} ref={this.map} onzoomend={() => this.updateRecordsBounds()} onmoveend={() => this.updateRecordsBounds()}>
+          <TileLayer
+            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <MarkerGroup reports={this.props.reports} view={this.props.view} viewSummary={this.props.viewSummary} />
+        </Map>
       </div>
     );
   }
 }
 
-function MarkerGroup(props){
+function MarkerGroup(props) {
   const reports = props.reports;
   let markers = ""
-  if(reports.length > 0){
-  markers = reports.map((report, index)=>{
-    return (<Marker position={report.location} key={index}>
+  if (reports.length > 0) {
+    markers = reports.map((report, index) => {
+      return (<Marker position={report.location} key={index}>
         <Popup >
-        <div className="summary">
-          <h4>{report.title}</h4>
-            Facilities: {report.facilities && report.facilities.length > 0 ? report.facilities.join(", ") : "None"}<br/>
-            Description: {report.details ? report.details.description :""}<br/>
+          <div className="summary">
+            <h4>{report.title}</h4>
+            Facilities: {report.facilities && report.facilities.length > 0 ? report.facilities.join(", ") : "None"}<br />
+            Description: {report.details ? report.details.description : ""}<br />
             <div className="buttonHolder">
-              <Button raised onClick={()=>props.view(report)}>View</Button>
+              <Button raised onClick={() => props.view(report)}>View</Button>
             </div>
-          </div>     
+          </div>
         </Popup>
       </Marker>)
+    }
+    );
   }
-  );
-}
   return (
-    <MarkerClusterGroup zoomToBoundsOnClick={false} onClusterClick={()=>props.viewSummary()}>{markers}</MarkerClusterGroup>
+    <MarkerClusterGroup zoomToBoundsOnClick={false} onClusterClick={() => props.viewSummary()}>{markers}</MarkerClusterGroup>
   )
 }

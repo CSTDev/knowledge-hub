@@ -1,6 +1,8 @@
 import React from 'react'
-import { Avatar, Paper, List, ListItem, Subheader } from 'react-md';
+import { Button, FontIcon, Paper, List, ListItem, Subheader } from 'react-md';
 import { formatLatitude, formatLongitude } from 'latlon-formatter';
+
+import FAEye from 'react-icons/lib/fa/eye';
 
 import './detailsPane.css';
 
@@ -32,7 +34,7 @@ export class DetailsPane extends React.Component {
         threeLines
         rightIcon={relevantFacilities.join(", ")}
         key={uuidv4()}
-        leftAvatar={<Avatar suffix="deep-purple"></Avatar>}
+        leftAvatar={<Button floating secondary onClick={(e)=>this.props.viewButtonAction(report, e)}><FAEye/></Button>}
         onClick={() => showReport(report)} />;
     });
   }

@@ -1,3 +1,8 @@
 .md-tile-addon--icon {
     font-weight: bold;
 }
+
+.md-icon{
+    display:flex;
+    justify-content: center;
+}
