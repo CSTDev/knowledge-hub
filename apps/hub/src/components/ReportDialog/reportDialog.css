@@ -11,7 +11,7 @@
     float: right;
     margin-right: 16px
 }
-.country, .description, .locationTitle, .location{
+.country, .description, .locationTitle, .location, shortName{
     margin: 8px
 }
 
@@ -26,7 +26,7 @@
     font-weight: bold;
 }
 
-#country {
+#country, #shortName {
     font-size: 24px;
     margin-bottom: 8px;
 }
