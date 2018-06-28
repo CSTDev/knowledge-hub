@@ -4,9 +4,10 @@
 
 .dataInput{
     margin: 8px;
+    width: calc(95%)
 }
 
-.showEmpty{
+.showEmpty, .location{
     float: right;
     margin-right: 16px
 }
@@ -28,4 +29,8 @@
 #country {
     font-size: 24px;
     margin-bottom: 8px;
+}
+
+.country, .description{
+    width: 95%;
 }
