@@ -3,6 +3,9 @@
 ### Running
 Set the REACT_APP_VERSION environment variable to the current version
 
+Then run:
+npm run start
+
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).

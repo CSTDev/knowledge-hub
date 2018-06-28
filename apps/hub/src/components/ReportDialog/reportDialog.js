@@ -76,6 +76,9 @@ export class ReportDialog extends React.Component {
             checked={this.state.showAll}
             onChange={(newState) => this.toggleShowEmpty(newState)}
           />
+          <p className="location">
+            Lat: {lat} - Lng: {lng}
+          </p>
           <TextField
             className="locationTitle"
             label="Name"
@@ -97,9 +100,6 @@ export class ReportDialog extends React.Component {
             defaultValue={report.details.description ? report.details.description : ""}
             onChange={this.onValueChange.bind(this, "description")}
           />
-          <h3 className="location">
-            Lat: {lat} Lng: {lng}
-          </h3>
           <Divider />
           {[].concat(this.props.fields)
             .sort((a, b) => a.order > b.order)
