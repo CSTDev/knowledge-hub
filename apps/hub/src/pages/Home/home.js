@@ -26,8 +26,15 @@ class Home extends Component {
       filteredReports: [],
       selectedReport: null,
       version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
-      fields: []
+      fields: [],
+      centre: { 
+        "lat":0,
+        "lng": 0
+      },
+      zoom: 2,
+      
     };
+    this.mapView = React.createRef();
   }
 
   componentDidMount() {
@@ -57,6 +64,12 @@ class Home extends Component {
   viewSummary() {
 
 
+  }
+
+  zoomToLocation = (report, e) =>{
+    e.preventDefault();
+    e.stopPropagation();
+    this.mapView.current.panMap(report.location.lat, report.location.lng)
   }
 
   getRecords = (bounds) => {
@@ -145,11 +158,11 @@ class Home extends Component {
             <SearchBar value={this.state.filterText} onChange={(value, event) => this.filterChange(value, event)} />
           </div>
           <div className="mapViewArea">
-            <MapView className="mapView" reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} getRecords={this.getRecords} />
+            <MapView className="mapView" ref={this.mapView} reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} getRecords={this.getRecords} centre={this.state.centre} zoom={this.state.zoom} />
           </div>
         </div>
         <div className="detailsArea">
-          <DetailsPane reports={this.state.filteredReports} showReport={this.showReport} filterTerm={this.state.filterText} />
+          <DetailsPane reports={this.state.filteredReports} showReport={this.showReport} filterTerm={this.state.filterText} viewButtonAction={this.zoomToLocation}/>
         </div>
         <ReportDialog report={this.state.selectedReport} onHide={this.hideReport} fields={this.state.fields} showFields={this.state.selectedReport ? !this.state.selectedReport.id : false} />
 
