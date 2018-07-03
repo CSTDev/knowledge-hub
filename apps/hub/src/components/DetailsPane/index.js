@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, FontIcon, Paper, List, ListItem, Subheader } from 'react-md';
+import { Button, Paper, List, ListItem, Subheader } from 'react-md';
 import { formatLatitude, formatLongitude } from 'latlon-formatter';
 
 import FAEye from 'react-icons/lib/fa/eye';

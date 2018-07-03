@@ -27,12 +27,12 @@ class Home extends Component {
       selectedReport: null,
       version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
       fields: [],
-      centre: { 
-        "lat":0,
+      centre: {
+        "lat": 0,
         "lng": 0
       },
       zoom: 2,
-      
+
     };
     this.mapView = React.createRef();
   }
@@ -66,10 +66,14 @@ class Home extends Component {
 
   }
 
-  zoomToLocation = (report, e) =>{
+  zoomToLocation = (report, e) => {
     e.preventDefault();
     e.stopPropagation();
     this.mapView.current.panMap(report.location.lat, report.location.lng)
+  }
+
+  resetMap = () => {
+    this.mapView.current.panMap(0, 0, 2)
   }
 
   getRecords = (bounds) => {
@@ -117,7 +121,7 @@ class Home extends Component {
 
             let newReports = this.state.reports;
             newReports.push(reportToSave)
-            this.setState({ reports: newReports })
+            this.setState({ reports: newReports, filteredReports: newReports })
           });
 
           this.setState({
@@ -152,7 +156,7 @@ class Home extends Component {
       <div>
         <ToastContainer />
         <VersionBar version={this.state.version} />
-        <MenuBar />
+        <MenuBar resetMap={this.resetMap} />
         <div className="mapArea">
           <div className="searchArea" style={{ display: this.state.selectedReport ? "none" : "block" }}>
             <SearchBar value={this.state.filterText} onChange={(value, event) => this.filterChange(value, event)} />
@@ -162,7 +166,7 @@ class Home extends Component {
           </div>
         </div>
         <div className="detailsArea">
-          <DetailsPane reports={this.state.filteredReports} showReport={this.showReport} filterTerm={this.state.filterText} viewButtonAction={this.zoomToLocation}/>
+          <DetailsPane reports={this.state.filteredReports} showReport={this.showReport} filterTerm={this.state.filterText} viewButtonAction={this.zoomToLocation} />
         </div>
         <ReportDialog report={this.state.selectedReport} onHide={this.hideReport} fields={this.state.fields} showFields={this.state.selectedReport ? !this.state.selectedReport.id : false} />
 

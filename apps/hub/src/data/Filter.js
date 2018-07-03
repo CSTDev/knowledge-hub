@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 /**
- * Filters reports. If a report title or and report text contains the filterText
+ * Filters reports. If a report title, short name, or facilities contains the text
  * then the report passes the filter
  * @param reports
  * @param filterText
