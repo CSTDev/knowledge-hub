@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, FontIcon, Paper, List, ListItem, Subheader } from 'react-md';
+import { Button, Paper, List, ListItem, Subheader } from 'react-md';
 import { formatLatitude, formatLongitude } from 'latlon-formatter';
 
 import FAEye from 'react-icons/lib/fa/eye';
@@ -18,15 +18,18 @@ export class DetailsPane extends React.Component {
       const lat = formatLatitude(report.location.lat, { degrees: true });
       const lon = formatLongitude(report.location.lng, { degrees: true });
       const country = report.location.country ? report.location.country : "";
-      const filterTerm = this.props.filterTerm;
+      const filterTerm = this.props.filterTerm.toUpperCase();
       let relevantFacilities = []
 
       if (report.facilities) {
         report.facilities.map(facility => {
-          if (facility.includes(filterTerm)) {
+          if (facility.toUpperCase().startsWith(filterTerm)) {
             relevantFacilities.push(facility)
           }
         })
+        if (relevantFacilities.length == 0){
+          relevantFacilities = report.facilities
+        }
       }
 
       return <ListItem primaryText={report.title}

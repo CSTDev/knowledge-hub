@@ -33,8 +33,9 @@ export class MapView extends React.Component {
     this.map = React.createRef();
   }
 
-  panMap = (lat, lng) => {
-    this.map.current.leafletElement.setView({ "lat": lat, "lng": lng }, DEFAULT_ZOOM);
+  panMap = (lat, lng, zoom) => {
+    zoom = zoom ? zoom : DEFAULT_ZOOM
+    this.map.current.leafletElement.setView({ "lat": lat, "lng": lng }, zoom);
 
     // TODO This sort of works, except the popup flashes and there's a couple warnings in the console
 

@@ -9,7 +9,10 @@ class MenuBar extends Component {
 
     nextPath = async (path) => {
         if (path == '/') {
-            if (this.props.homeAction !== undefined) {
+            if (this.props.location.pathname === '/') {
+                this.props.resetMap()
+            }
+            if (this.props.location.pathname === '/settings') {
                 if (await this.props.homeAction()) {
                     this.props.history.push(path)
                 } else {

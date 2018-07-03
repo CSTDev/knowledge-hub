@@ -1,442 +1,356 @@
-{
-  "id": "1",
-  "title": "Holy Trinity Church",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.619060757481970,
-      53.862309546682600
-    ],
-    "lng": -1.619060757481970,
-    "lat": 53.862309546682600
-  }
-}
-{
-  "id": "2",
-  "title": "Adel Methodist Church Hall",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.593298176150450,
-      53.856553683013900
-    ],
-    "lng": -1.593298176150450,
-    "lat": 53.856553683013900
-  }
-}
-{
-  "id": "3",
-  "title": "Holy Trinity C of E Primary School",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.621931650684400,
-      53.859253737305600
-    ],
-    "lng": -1.621931650684400,
-    "lat": 53.859253737305600
-  }
-}
-{
-  "id": "4",
-  "title": "Holt Park Active",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.607800118137020,
-      53.855740000000000
-    ],
-    "lng": -1.607800118137020,
-    "lat": 53.855740000000000
-  }
-}
-{
-  "id": "5",
-  "title": "Adel Memorial Hall",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.587123901914960,
-      53.855193410998400
-    ],
-    "lng": -1.587123901914960,
-    "lat": 53.855193410998400
-  }
-}
-{
-  "id": "6",
-  "title": "Adel St John The Baptist C of E Primary School",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.581864000000000,
-      53.850619000000000
-    ],
-    "lng": -1.581864000000000,
-    "lat": 53.850619000000000
-  }
-}
-{
-  "id": "7",
-  "title": "Old Pool Bank Village Hall",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.644098302564380,
-      53.893412538482000
-    ],
-    "lng": -1.644098302564380,
-    "lat": 53.893412538482000
-  }
-}
-{
-  "id": "8",
-  "title": "Pool In Wharfedale Village Memorial Hall",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.624836571149610,
-      53.901658724367000
-    ],
-    "lng": -1.624836571149610,
-    "lat": 53.901658724367000
-  }
-}
-{
-  "id": "9",
-  "title": "Wigton Moor United Reformed Church",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.519309444740910,
-      53.856136491444500
-    ],
-    "lng": -1.519309444740910,
-    "lat": 53.856136491444500
-  }
-}
+[
   {
-  "id": "10",
-  "title": "Charlie Bretts At The Allerton",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.543827000000000,
-      53.852279805514400
+    "id": "5b3b5238f228aa0d9ced5f1c",
+    "title": "London Gatwick",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        -0.1811027526855469,
+        51.15135539457423
+      ],
+      "lat": 51.15135539457423,
+      "lng": -0.1811027526855469,
+      "country": "London, UK"
+    },
+    "shortName": "LGW 01",
+    "facilities": [
+      "PAR4",
+      "BUS2",
+      "TAXI3",
+      "TRN2"
     ],
-    "lng": -1.543827000000000,
-    "lat": 53.852279805514400
-  }
-}
+    "details": {
+      "description": "Airport"
+    }
+  },
   {
-  "id": "11",
-  "title": "Tree Tops Community Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.521085452363010,
-      53.851047410664900
+    "id": "5b3b52bdf228aa0d9ced5f1d",
+    "title": "London Heathrow",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        -0.4535293579101563,
+        51.470798036736966
+      ],
+      "lat": 51.470798036736966,
+      "lng": -0.4535293579101563,
+      "country": "London, UK"
+    },
+    "shortName": "LHR 02",
+    "facilities": [
+      "PAR2",
+      "BUS1",
+      "TAXI3"
     ],
-    "lng": -1.521085452363010,
-    "lat": 53.851047410664900
-  }
-}
+    "details": {
+      "description": "Airport"
+    }
+  },
   {
-  "id": "12",
-  "title": "Tree Tops Community Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.521085452363010,
-      53.851047410664900
+    "id": "5b3b5350f228aa0d9ced5f1e",
+    "title": "Manchester Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        -2.273054122924805,
+        53.36463829658088
+      ],
+      "lat": 53.36463829658088,
+      "lng": -2.273054122924805,
+      "country": "Manchester, UK"
+    },
+    "shortName": "MAN 01",
+    "facilities": [
+      "PAR4",
+      "BUS4",
+      "TAXI1"
     ],
-    "lng": -1.521085452363010,
-    "lat": 53.851047410664900
-  }
-}
+    "details": {
+      "description": "Airport"
+    }
+  },
   {
-  "id": "13",
-  "title": "Lord D'Arcy Public House",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.530208085264650,
-      53.856305457705300
+    "id": "5b3b5391f228aa0d9ced5f1f",
+    "title": "Glasgow Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        -4.432296752929688,
+        55.86471624710687
+      ],
+      "lat": 55.86471624710687,
+      "lng": -4.432296752929688,
+      "country": "Glasgow, UK"
+    },
+    "shortName": "GGW 01",
+    "facilities": [
+      "PAR1",
+      "BUS4",
+      "TAXI3"
     ],
-    "lng": -1.530208085264650,
-    "lat": 53.856305457705300
-  }
-}
+    "details": {
+      "description": "Airport"
+    }
+  },
   {
-  "id": "14",
-  "title": "St John's Church Hall",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.535025000000000,
-      53.849656000000000
+    "id": "5b3b53d9f228aa0d9ced5f20",
+    "title": "Edinburgh Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        -3.3636188507080083,
+        55.94838281203942
+      ],
+      "lat": 55.94838281203942,
+      "lng": -3.3636188507080083,
+      "country": "Edinburgh, UK"
+    },
+    "shortName": "EDI 01",
+    "facilities": [
+      "PAR3",
+      "BUS2",
+      "TAXI1"
     ],
-    "lng": -1.535025000000000,
-    "lat": 53.849656000000000
-  }
-}
+    "details": {
+      "description": "Edinburgh's main airport"
+    }
+  },
   {
-  "id": "15",
-  "title": "Alwoodley Primary School",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.556075773153940,
-      53.850572000000000
+    "id": "5b3b547bf228aa0d9ced5f21",
+    "title": "Charles de Gaulle",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        2.5697708129882817,
+        49.00432140454431
+      ],
+      "lat": 49.00432140454431,
+      "lng": 2.5697708129882817,
+      "country": "Paris, France"
+    },
+    "shortName": "CDG 01",
+    "facilities": [
+      "PAR4",
+      "BUS4",
+      "TAXI4"
     ],
-    "lng": -1.556075773153940,
-    "lat": 53.850572000000000
-  }
-}
+    "details": {
+      "description": "Largest international airport in France"
+    }
+  },
   {
-  "id": "16",
-  "title": "Moortown Methodist Church Hall",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.559888242380940,
-      53.844338093517500
+    "id": "5b3b54e3f228aa0d9ced5f22",
+    "title": "Orly Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        2.369613647460938,
+        48.72913378674092
+      ],
+      "lat": 48.72913378674092,
+      "lng": 2.369613647460938,
+      "country": "Paris, France"
+    },
+    "shortName": "ORY 01",
+    "facilities": [
+      "PAR2",
+      "BUS3",
+      "TAXI2"
     ],
-    "lng": -1.559888242380940,
-    "lat": 53.844338093517500
-  }
-}
+    "details": {
+      "description": "Secondary airport hub"
+    }
+  },
   {
-  "id": "17",
-  "title": "Alwoodley Community Association",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.554911236488480,
-      53.859338622661200
+    "id": "5b3b554df228aa0d9ced5f23",
+    "title": "Barcelona–El Prat Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        2.0777893066406254,
+        41.29715463542581
+      ],
+      "lat": 41.29715463542581,
+      "lng": 2.0777893066406254,
+      "country": "Barcelona, Spain"
+    },
+    "shortName": "BCN 01",
+    "facilities": [
+      "PAR3",
+      "BUS4",
+      "TAXI1"
     ],
-    "lng": -1.554911236488480,
-    "lat": 53.859338622661200
-  }
-}
+    "details": {
+      "description": "An international airport located 12 km southwest of the centre of Barcelona"
+    }
+  },
   {
-  "id": "18",
-  "title": "The Old Halfway House",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.508069000000000,
-      53.741098290480500
+    "id": "5b3b55a6f228aa0d9ced5f24",
+    "title": "Málaga–Costa del Sol Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        -4.489202499389649,
+        36.67571616607861
+      ],
+      "lat": 36.67571616607861,
+      "lng": -4.489202499389649,
+      "country": "Malaga, Spain"
+    },
+    "shortName": "AGP 01",
+    "facilities": [
+      "PAR1",
+      "BUS3",
+      "TAXI4"
     ],
-    "lng": -1.508069000000000,
-    "lat": 53.741098290480500
-  }
-}
+    "details": {}
+  },
   {
-  "id": "19",
-  "title": "Lofthouse Community Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.501960624733950,
-      53.731958596112500
+    "id": "5b3b55e9f228aa0d9ced5f25",
+    "title": "Federico García Lorca Granada Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        -3.7770223617553715,
+        37.185792234204726
+      ],
+      "lat": 37.185792234204726,
+      "lng": -3.7770223617553715,
+      "country": "Granada, Spain"
+    },
+    "shortName": "GRX 01",
+    "facilities": [
+      "PAR1",
+      "BUS1",
+      "TAXI2"
     ],
-    "lng": -1.501960624733950,
-    "lat": 53.731958596112500
-  }
-}
+    "details": {}
+  },
   {
-  "id": "20",
-  "title": "Methodist Schoolroom",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.496362961417380,
-      53.727243394104200
+    "id": "5b3b563cf228aa0d9ced5f26",
+    "title": "Bilbao Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        -2.906270027160645,
+        43.30400704795523
+      ],
+      "lat": 43.30400704795523,
+      "lng": -2.906270027160645,
+      "country": "Bilbao, Spain"
+    },
+    "shortName": "BIO 01",
+    "facilities": [
+      "TAXI1",
+      "BUS1"
     ],
-    "lng": -1.496362961417380,
-    "lat": 53.727243394104200
-  }
-}
+    "details": {}
+  },
   {
-  "id": "21",
-  "title": "Thorpe Community Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.526484168162810,
-      53.732165804458200
+    "id": "5b3b56c2f228aa0d9ced5f27",
+    "title": "Malpensa Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        8.71370315551758,
+        45.62724411917226
+      ],
+      "lat": 45.62724411917226,
+      "lng": 8.71370315551758,
+      "country": "Ferno, VA, Italy"
+    },
+    "shortName": "MXP 01",
+    "facilities": [
+      "PAR3",
+      "BUS2"
     ],
-    "lng": -1.526484168162810,
-    "lat": 53.732165804458200
-  }
-}
-{
-  "id": "22",
-  "title": "Thorpe Social Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.531987122266040,
-      53.737580293275000
-    ],
-    "lng": -1.531987122266040,
-    "lat": 53.737580293275000
-  }
-}
+    "details": {
+      "description": "Malpensa Airport, formerly City of Busto Arsizio Airport, is the largest international airport in the Milan metropolitan area"
+    }
+  },
   {
-  "id": "23",
-  "title": "Christ Church Hall",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.496436099059490,
-      53.730003067762100
+    "id": "5b3b59c3f228aa0d9ced5f28",
+    "title": "Leonardo da Vinci–Fiumicino Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        12.25181579589844,
+        41.793328494130236
+      ],
+      "lat": 41.793328494130236,
+      "lng": 12.25181579589844,
+      "country": "Rome, Italy"
+    },
+    "shortName": "FCO 01",
+    "facilities": [
+      "PAR2",
+      "TAXI2"
     ],
-    "lng": -1.496436099059490,
-    "lat": 53.730003067762100
-  }
-}
+    "details": {}
+  },
   {
-  "id": "24",
-  "title": "Tingley Youth & Community Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.564494713008940,
-      53.728364084777200
+    "id": "5b3b5a2bf228aa0d9ced5f29",
+    "title": "Turin Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        7.646141052246095,
+        45.1948610384154
+      ],
+      "lat": 45.1948610384154,
+      "lng": 7.646141052246095,
+      "country": "Turin, Italy"
+    },
+    "shortName": "TRN 01",
+    "facilities": [
+      "PAR1",
+      "BUS2",
+      "TAXI3"
     ],
-    "lng": -1.564494713008940,
-    "lat": 53.728364084777200
-  }
-}
+    "details": {}
+  },
   {
-  "id": "25",
-  "title": "West Ardsley Community Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.577163397322840,
-      53.714999115144500
+    "id": "5b3b5a91f228aa0d9ced5f2a",
+    "title": "Frankfurt Airport",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        8.551826477050783,
+        50.044352641775326
+      ],
+      "lat": 50.044352641775326,
+      "lng": 8.551826477050783,
+      "country": "Frankfurt, Germany"
+    },
+    "shortName": "FRA 01",
+    "facilities": [
+      "PAR4",
+      "BUS4",
+      "TRN4"
     ],
-    "lng": -1.577163397322840,
-    "lat": 53.714999115144500
-  }
-}
+    "details": {}
+  },
   {
-  "id": "26",
-  "title": "Tingley Athletics Club",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.551029993238790,
-      53.730300805463300
+    "id": "5b3b5aeff228aa0d9ced5f2b",
+    "title": "Berlin Schönefeld",
+    "location": {
+      "type": "Point",
+      "Coordinates": [
+        13.511381149291994,
+        52.364384552078526
+      ],
+      "lat": 52.364384552078526,
+      "lng": 13.511381149291994,
+      "country": "Berlin, Germany"
+    },
+    "shortName": "SXF 02",
+    "facilities": [
+      "PAR1",
+      "BUS4",
+      "TRN3"
     ],
-    "lng": -1.551029993238790,
-    "lat": 53.730300805463300
+    "details": {
+      "description": "Airport"
+    }
   }
-}
-  {
-  "id": "27",
-  "title": "St Michael's Parish Hall",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.543731053256380,
-      53.722651304380900
-    ],
-    "lng": -1.543731053256380,
-    "lat": 53.722651304380900
-  }
-}
-  {
-  "id": "28",
-  "title": "St Gabriels Community Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.532492408309690,
-      53.727560483504800
-    ],
-    "lng": -1.532492408309690,
-    "lat": 53.727560483504800
-  }
-}
-  {
-  "id": "29",
-  "title": "Northfields Community Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.501497521504950,
-      53.745483833197700
-    ],
-    "lng": -1.501497521504950,
-    "lat": 53.745483833197700
-  }
-}
-  {
-  "id": "30",
-  "title": "Tingley Youth & Community Centre",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.564494713008940,
-      53.728364084777200
-    ],
-    "lng": -1.564494713008940,
-    "lat": 53.728364084777200
-  }
-}
- {
-  "id": "31",
-  "title": "The Apostolic Church",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.606605192833640,
-      53.810660516345800
-    ],
-    "lng": -1.606605192833640,
-    "lat": 53.810660516345800
-  }
-}
-  {
-  "id": "32",
-  "title": "Portable building at the junction of",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.60946402438009,
-      53.805348953790500
-    ],
-    "lng": -1.609464024380090,
-    "lat": 53.805348953790500
-  }
-}
-  {
-  "id": "32",
-  "title": "Armley Primary School",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.588386643750430,
-      53.800820462506500
-    ],
-    "lng": -1.588386643750430,
-    "lat": 53.800820462506500
-  }
-}
-  {
-  "id": "34",
-  "title": "Holy Family R C Primary School",
-  "location": {
-    "type": "Point",
-    "coordinates": [
-      -1.581010532627160,
-      53.795968366659900
-    ],
-    "lng": -1.581010532627160,
-    "lat": 53.795968366659900
-  }
-}
+]

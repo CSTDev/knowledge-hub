@@ -1,0 +1,21 @@
+.filter-options {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #FFFFFFC0;
+    border-radius: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left:8px;
+    height: 100px;
+}
+
+.filter-options__header{
+    display:flex;
+    justify-content: center;
+
+}
+
+.filter-options__options{
+    display: flex;
+}
