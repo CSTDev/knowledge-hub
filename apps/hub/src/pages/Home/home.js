@@ -3,12 +3,13 @@ import './home.css';
 import 'react-md/dist/react-md.blue_grey-amber.min.css';
 import 'material-icons/iconfont/MaterialIcons-Regular.woff2'
 import 'material-icons/iconfont/material-icons.css'
-import { SearchBar } from '../../components/SearchBar';
+import { SearchBar } from '../../components/SearchBar/searchBar';
 import { DetailsPane } from '../../components/DetailsPane';
 import { FilterData } from '../../data/Filter';
 import { ReportDialog } from "../../components/ReportDialog/reportDialog";
 import { MapView } from '../../components/Map/map';
 import { VersionBar } from '../../components/VersionBar/versionBar';
+import { FilterOptions } from '../../components/FilterOptions/filterOptions';
 import { CreateRecord, GetRecords, LoadFields, UpdateRecord } from '../../data/api'
 import { ToastContainer, toast } from 'react-toastify';
 import '../../react-toastify.css';
@@ -24,6 +25,12 @@ class Home extends Component {
       filterText: "",
       reports: [],
       filteredReports: [],
+      filterOptions: {
+        "facilities": true,
+        "title": true,
+        "shortName": true,
+        "locations": true,
+      },
       selectedReport: null,
       version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
       fields: [],
@@ -52,13 +59,36 @@ class Home extends Component {
     });
   }
 
-  filterChange(value, event) {
-    const filteredReports = FilterData(this.state.reports, value, null);
+  filterChange = (value, event) => {
+    const filteredReports = FilterData(this.state.reports, value, this.state.filterOptions, null);
 
     this.setState({
       filterText: value,
       filteredReports: filteredReports
     });
+  }
+
+  toggleFilter = (option) => {
+    let filterOptions = { ...this.state.filterOptions };
+    switch (option) {
+      case "facilities":
+        filterOptions.facilities = !filterOptions.facilities;
+        this.setState({ filterOptions }, () =>{this.filterChange(this.state.filterText)});
+        break;
+      case "title":
+        filterOptions.title = !filterOptions.title;
+        this.setState({ filterOptions }, () =>{this.filterChange(this.state.filterText)});
+        break;
+      case "shortName":
+        filterOptions.shortName = !filterOptions.shortName;
+        this.setState({ filterOptions }, () =>{this.filterChange(this.state.filterText)});
+        break;
+      case "locations":
+        console.log("Changed locations to " + !filterOptions.locations)
+        filterOptions.locations = !filterOptions.locations;
+        this.setState({ filterOptions }, () =>{this.filterChange(this.state.filterText)});
+        break;
+    }
   }
 
   viewSummary() {
@@ -158,8 +188,9 @@ class Home extends Component {
         <VersionBar version={this.state.version} />
         <MenuBar resetMap={this.resetMap} />
         <div className="mapArea">
-          <div className="searchArea" style={{ display: this.state.selectedReport ? "none" : "block" }}>
+          <div className="search-area" style={{ display: this.state.selectedReport ? "none" : "flex" }}>
             <SearchBar value={this.state.filterText} onChange={(value, event) => this.filterChange(value, event)} />
+            <FilterOptions filterState={this.state.filterOptions} toggleFilter={this.toggleFilter} />
           </div>
           <div className="mapViewArea">
             <MapView className="mapView" ref={this.mapView} reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} getRecords={this.getRecords} centre={this.state.centre} zoom={this.state.zoom} />

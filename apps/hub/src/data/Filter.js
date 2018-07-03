@@ -9,24 +9,33 @@ import * as _ from 'lodash';
  * @returns {*}
  * @constructor
  */
-export function FilterData(reports, filterText, mapBounds) {
+export function FilterData(reports, filterText, filterOptions, mapBounds) {
+  filterText = filterText.toUpperCase();
   const reportsMatchingTextFilter = _.filter(reports, report => {
 
-
-    if (report.title.includes(filterText) || report.shortName.includes(filterText) || _.some(report.facilities, facility => {
-      return facility.includes(filterText);
-    }))  {
+    if (filterText === "")
+      return true;
+    if (filterOptions.title && report.title.toUpperCase().includes(filterText)) {
       return true;
     }
 
-    // if (report.reports.some(childReport => childReport.reportDetails.includes(filterText))) {
-    //   return true;
-    // }
+    if (filterOptions.locations && report.location.country.toUpperCase().includes(filterText)) {
+      return true;
+    }
+
+    if (filterOptions.shortName && report.shortName.toUpperCase().startsWith(filterText)) {
+      return true;
+    }
+
+    if (filterOptions.facilities && (_.some(report.facilities, facility => {
+      return facility.toUpperCase().startsWith(filterText);
+    }) )) {
+      return true;
+    }
 
     return false;
   });
 
   return reportsMatchingTextFilter;
-  // TODO: Add map bounds filter
 }
 
