@@ -21,7 +21,6 @@
 .search-area {
   position: absolute;
   width: calc(100% - 10px);
-  height: calc(65px);
   left: 5px;
   top: 15px;
   z-index: 999;
