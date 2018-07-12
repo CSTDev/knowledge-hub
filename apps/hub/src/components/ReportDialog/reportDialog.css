@@ -11,10 +11,14 @@
     float: right;
     margin-right: 16px
 }
-.country, .description, .locationTitle, .location, shortName, .facilities{
+.country, .description, .locationTitle, .location, .shortName, .facilities {
     margin: 8px
 }
 
+.facilities__chip {
+    margin-bottom: 16px;
+    margin-left: 4px;
+}
 
 .locationTitle {
     width: calc(75%);

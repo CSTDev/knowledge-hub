@@ -33,13 +33,14 @@ class Home extends Component {
       },
       selectedReport: null,
       version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
+      versionColor: process.env.REACT_APP_VERSION_COLOUR ? process.env.REACT_APP_VERSION_COLOUR : "#58af58",
+      mapProvider: process.env.REACT_APP_MAP_PROVIDER ? process.env.REACT_APP_MAP_PROVIDER : "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
       fields: [],
       centre: {
         "lat": 0,
         "lng": 0
       },
       zoom: 2,
-
     };
     this.mapView = React.createRef();
   }
@@ -73,20 +74,19 @@ class Home extends Component {
     switch (option) {
       case "facilities":
         filterOptions.facilities = !filterOptions.facilities;
-        this.setState({ filterOptions }, () =>{this.filterChange(this.state.filterText)});
+        this.setState({ filterOptions }, () => { this.filterChange(this.state.filterText) });
         break;
       case "title":
         filterOptions.title = !filterOptions.title;
-        this.setState({ filterOptions }, () =>{this.filterChange(this.state.filterText)});
+        this.setState({ filterOptions }, () => { this.filterChange(this.state.filterText) });
         break;
       case "shortName":
         filterOptions.shortName = !filterOptions.shortName;
-        this.setState({ filterOptions }, () =>{this.filterChange(this.state.filterText)});
+        this.setState({ filterOptions }, () => { this.filterChange(this.state.filterText) });
         break;
       case "locations":
-        console.log("Changed locations to " + !filterOptions.locations)
         filterOptions.locations = !filterOptions.locations;
-        this.setState({ filterOptions }, () =>{this.filterChange(this.state.filterText)});
+        this.setState({ filterOptions }, () => { this.filterChange(this.state.filterText) });
         break;
     }
   }
@@ -104,27 +104,36 @@ class Home extends Component {
 
   resetMap = () => {
     this.mapView.current.panMap(0, 0, 2)
+    this.setState({
+      filterText: "",
+      filterOptions: {
+        "facilities": true,
+        "title": true,
+        "shortName": true,
+        "locations": true,
+      }
+    })
   }
 
   getRecords = (bounds) => {
-    let records = GetRecords(bounds).then(response => {
-      if (!response || (response.status !== 200)) {
-        if (response.message && response.message == "404") {
-          this.setState({ reports: [], filteredReports: [] });
-          return
+      let records = GetRecords(bounds).then(response => {
+        if (!response || (response.status !== 200)) {
+          if (response.message && response.message == "404") {
+            this.setState({ reports: [], filteredReports: [] });
+            return
+          }
+          toast("Failed to load records");
+          return;
         }
-        toast("Failed to load records");
-        return;
-      }
-      response.json().then(json => {
-        return json;
-      }).then(records => {
-        this.setState({ reports: records });
+        response.json().then(json => {
+          return json;
+        }).then(records => {
+          this.setState({ reports: records });
 
-        this.filterChange(this.state.filterText)
+          this.filterChange(this.state.filterText)
 
+        });
       });
-    });
   }
 
   showReport = (report) => {
@@ -132,7 +141,7 @@ class Home extends Component {
       report.details = {}
     }
     this.setState({
-      selectedReport: report
+      selectedReport: report,
     });
   };
 
@@ -155,7 +164,7 @@ class Home extends Component {
           });
 
           this.setState({
-            selectedReport: null
+            selectedReport: null,
           });
         });
 
@@ -168,14 +177,14 @@ class Home extends Component {
           toast("Saved")
 
           this.setState({
-            selectedReport: null
+            selectedReport: null,
           });
         });
       }
 
     } else {
       this.setState({
-        selectedReport: null
+        selectedReport: null,
       });
     }
 
@@ -185,7 +194,7 @@ class Home extends Component {
     return (
       <div>
         <ToastContainer />
-        <VersionBar version={this.state.version} />
+        <VersionBar version={this.state.version} versionColor={this.state.versionColor}/>
         <MenuBar resetMap={this.resetMap} />
         <div className="mapArea">
           <div className="search-area" style={{ display: this.state.selectedReport ? "none" : "flex" }}>
@@ -193,7 +202,7 @@ class Home extends Component {
             <FilterOptions filterState={this.state.filterOptions} toggleFilter={this.toggleFilter} />
           </div>
           <div className="mapViewArea">
-            <MapView className="mapView" ref={this.mapView} reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} getRecords={this.getRecords} centre={this.state.centre} zoom={this.state.zoom} />
+            <MapView className="mapView" ref={this.mapView} mapProvider={this.state.mapProvider} reports={this.state.filteredReports} view={this.showReport} viewSummary={this.viewSummary} getRecords={this.getRecords} centre={this.state.centre} zoom={this.state.zoom} />
           </div>
         </div>
         <div className="detailsArea">

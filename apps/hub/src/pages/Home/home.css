@@ -20,9 +20,8 @@
 
 .search-area {
   position: absolute;
-  width: calc(100% - 60px);
-  height: calc(65px);
-  left: 55px;
+  width: calc(100% - 10px);
+  left: 5px;
   top: 15px;
   z-index: 999;
   display: flex; /* Overridden in-line to hide when viewing dialog*/

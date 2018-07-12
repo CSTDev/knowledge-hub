@@ -1,7 +1,11 @@
 
 
 ### Running
-Set the REACT_APP_VERSION environment variable to the current version
+Set the following environment variables:
+  REACT_APP_VERSION - the current version (defaults to 0.0.1)
+  REACT_APP_MAP_PROVIDER - where to get the map tiles from e.g. http://{s}.tile.osm.org/{z}/{x}/{y}.png (defaults to this OSM URL)
+  REACT_APP_API_URL - URL of the knowledge API (defaults to what's in .env files)
+
 
 Then run:
 npm run start

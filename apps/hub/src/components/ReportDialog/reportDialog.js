@@ -163,7 +163,7 @@ export class ReportDialog extends React.Component {
             defaultValue={report.details.description ? report.details.description : ""}
             onChange={this.onValueChange.bind(this, "description")}
           />
-          {chips}
+          
           <TextField
             className="facilities"
             label="Facilities"
@@ -171,6 +171,7 @@ export class ReportDialog extends React.Component {
             onBlur={this.addFacilityOnTab.bind(this)}
             onKeyUp={this.addFacility.bind(this)}
           />
+          {chips}
           <Divider />
           {[].concat(this.props.fields)
             .sort((a, b) => a.order > b.order)

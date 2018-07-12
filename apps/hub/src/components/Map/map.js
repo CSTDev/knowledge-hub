@@ -79,9 +79,9 @@ export class MapView extends React.Component {
 
     return (
       <div className="mapContainer">
-        <Map center={position} zoom={this.state.zoom} oncontextmenu={this.newPoint} ref={this.map} onzoomend={() => this.updateRecordsBounds()} onmoveend={() => this.updateRecordsBounds()}>
+        <Map zoomControl={false} center={position} zoom={this.state.zoom} oncontextmenu={this.newPoint} ref={this.map} onzoomend={() => this.updateRecordsBounds()} onmoveend={() => this.updateRecordsBounds()}>
           <TileLayer
-            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+            url={this.props.mapProvider}
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           />
           <MarkerGroup reports={this.props.reports} view={this.props.view} viewSummary={this.props.viewSummary} />

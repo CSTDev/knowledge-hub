@@ -8,7 +8,7 @@ export class VersionBar extends React.Component {
   
     render() {  
       return (
-      <div className="versionBar">
+      <div className="versionBar" style={{background:this.props.versionColor}}>
         <p className="version">{this.props.version}</p>
       </div>
     )
