@@ -33,6 +33,7 @@ class Home extends Component {
       },
       selectedReport: null,
       version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
+      versionColor: process.env.REACT_APP_VERSION_COLOUR ? process.env.REACT_APP_VERSION_COLOUR : "#58af58",
       mapProvider: process.env.REACT_APP_MAP_PROVIDER ? process.env.REACT_APP_MAP_PROVIDER : "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
       fields: [],
       centre: {
@@ -193,7 +194,7 @@ class Home extends Component {
     return (
       <div>
         <ToastContainer />
-        <VersionBar version={this.state.version} />
+        <VersionBar version={this.state.version} versionColor={this.state.versionColor}/>
         <MenuBar resetMap={this.resetMap} />
         <div className="mapArea">
           <div className="search-area" style={{ display: this.state.selectedReport ? "none" : "flex" }}>
