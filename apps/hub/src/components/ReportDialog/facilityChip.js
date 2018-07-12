@@ -9,6 +9,7 @@ export default class FacilityChip extends PureComponent {
       render() {
         return (
           <Chip
+            className="facilities__chip"
             onClick={this.handleRemove}
             removable
             label={this.props.name}
