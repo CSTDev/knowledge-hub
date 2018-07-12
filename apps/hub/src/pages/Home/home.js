@@ -104,6 +104,14 @@ class Home extends Component {
 
   resetMap = () => {
     this.mapView.current.panMap(0, 0, 2)
+    this.setState({filterText: "",
+      filterOptions: {
+        "facilities": true,
+        "title": true,
+        "shortName": true,
+        "locations": true,
+      } 
+    })
   }
 
   getRecords = (bounds) => {
