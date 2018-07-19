@@ -1,6 +1,6 @@
 export function GetRecords(bounds){
     let queryString = "minLat=" + bounds._southWest.lat + "&minLng=" + bounds._southWest.lng + "&maxLat=" + bounds._northEast.lat + "&maxLng=" + bounds._northEast.lng
-    return fetch(process.env.REACT_APP_API_URL + '/record?' + queryString, {
+    return fetch(window.APP_CONFIG.API_URL + '/record?' + queryString, {
         method: 'GET'
     }).then(response => {
         if(!response.ok)
@@ -12,7 +12,7 @@ export function GetRecords(bounds){
 }
 
 export function CreateRecord(record) {
-        return fetch(process.env.REACT_APP_API_URL + '/record', {
+        return fetch(window.APP_CONFIG.API_URL + '/record', {
             method:'POST',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(
@@ -29,7 +29,7 @@ export function CreateRecord(record) {
 }
 
 export function UpdateRecord(record){
-    return fetch(process.env.REACT_APP_API_URL + '/record/' + record.id, {
+    return fetch(window.APP_CONFIG.API_URL + '/record/' + record.id, {
         method:'PUT',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify(
@@ -46,7 +46,7 @@ export function UpdateRecord(record){
 }
 
 export function LoadFields(){
-    return fetch(process.env.REACT_APP_API_URL + '/field', {
+    return fetch(window.APP_CONFIG.API_URL + '/field', {
         method: 'GET'
     }).then(response => {
         if(!response.ok)
@@ -60,7 +60,7 @@ export function LoadFields(){
 
 
 export function UpdateFields(fields){
-    return fetch(process.env.REACT_APP_API_URL + '/field', {
+    return fetch(window.APP_CONFIG.API_URL + '/field', {
         method:'PUT',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify(
@@ -84,7 +84,7 @@ export function UpdateField(fieldId, value){
 }
 
 export function DeleteField(fieldId){
-    return fetch(process.env.REACT_APP_API_URL + '/field/' + fieldId, {
+    return fetch(window.APP_CONFIG.API_URL + '/field/' + fieldId, {
         method: 'DELETE'
     }).then(response => {
         if(!response.ok)

@@ -32,9 +32,9 @@ class Home extends Component {
         "locations": true,
       },
       selectedReport: null,
-      version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
-      versionColor: process.env.REACT_APP_VERSION_COLOUR ? process.env.REACT_APP_VERSION_COLOUR : "#58af58",
-      mapProvider: process.env.REACT_APP_MAP_PROVIDER ? process.env.REACT_APP_MAP_PROVIDER : "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
+      version: window.APP_CONFIG.VERSION ? window.APP_CONFIG.VERSION : "0.0.1",
+      versionColor: window.APP_CONFIG.VERSION_COLOUR ? window.APP_CONFIG.VERSION_COLOUR : "#58af58",
+      mapProvider: window.APP_CONFIG.MAP_PROVIDER ? window.APP_CONFIG.MAP_PROVIDER : "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
       fields: [],
       centre: {
         "lat": 0,
