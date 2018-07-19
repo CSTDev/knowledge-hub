@@ -7,12 +7,15 @@ COPY ./public/ ./public
 RUN npm run build
 
 FROM node:8
+ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+USER node
 WORKDIR /usr/src/app/
-RUN npm install -g serve
+RUN npm install -g @staticdeploy/app-server
 COPY --from=0 /usr/src/app/build ./build
 COPY --from=0 /usr/src/app/node_modules ./node_modules
+ENV PATH="{$PATH}:/home/node/.npm-global/bin/"
 
-ENTRYPOINT serve -s build
+ENTRYPOINT app-server
 
-EXPOSE 5000
+EXPOSE 3000
 

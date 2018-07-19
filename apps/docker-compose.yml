@@ -1,0 +1,22 @@
+version: '2'
+services:
+  hub:
+    image: "hub:0.0.3"
+    ports: 
+      - "3000:3000"
+    environment:
+      - APP_CONFIG_VERSION=1.0.0
+      - APP_CONFIG_MAP_PROVIDER=http://{s}.tile.osm.org/{z}/{x}/{y}.png
+      - APP_CONFIG_API_URL=http://localhost:8000/v1
+      - APP_SERVER_BASE_PATH=
+    depends_on:
+      - knowledge
+      - database
+  knowledge:
+    image: "knowledge:0.0.9"
+    environment:
+      - MONGODB_URI=mongodb://database:27017
+    depends_on:
+      - database
+  database:
+    image: "mongo:3.6"

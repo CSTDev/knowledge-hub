@@ -35,4 +35,6 @@ apps/knowledge/main.exe~
 # Go SymLinks
 /knowledge
 
+# Docker images
+*.tar
 
