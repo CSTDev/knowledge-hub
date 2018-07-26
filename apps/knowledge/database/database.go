@@ -32,6 +32,7 @@ type MongoDB struct {
 // Create takes a record and writes it to the Mongo database
 func (db *MongoDB) Create(r types.Record) (string, error) {
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return "", err
 	}
@@ -80,6 +81,7 @@ func (db *MongoDB) Search(query types.SearchQuery) ([]types.Record, error) {
 		"maxLng": query.MaxLng,
 	}).Debug("Searching DB")
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +130,7 @@ func (db *MongoDB) Update(id string, r types.Record) error {
 	r.Location.Coordinates = []float64{r.Location.Lng, r.Location.Lat}
 
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return err
 	}
@@ -154,6 +157,7 @@ func (db *MongoDB) Delete(id string) error {
 	}).Debug("Marking record as deleted.")
 
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return err
 	}
@@ -174,6 +178,7 @@ func (db *MongoDB) Delete(id string) error {
 // Fields retrieves all the set fields that can be use for entering information
 func (db *MongoDB) Fields() ([]types.Field, error) {
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -196,6 +201,7 @@ func (db *MongoDB) Fields() ([]types.Field, error) {
 // UpdateFields writes the fields objects to the database, updating any that already exist.
 func (db *MongoDB) UpdateFields(fields []types.Field) error {
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return err
 	}
@@ -223,6 +229,7 @@ func (db *MongoDB) UpdateFields(fields []types.Field) error {
 func (db *MongoDB) DeleteField(id string) error {
 
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return err
 	}

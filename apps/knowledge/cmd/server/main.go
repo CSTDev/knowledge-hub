@@ -23,7 +23,15 @@ func main() {
 	dbCollection := "records"
 	fieldCollection := "fields"
 
-	log.SetLevel(log.DebugLevel)
+	switch logLevel := os.Getenv("LOG_LEVEL"); logLevel {
+	case "debug":
+		log.SetLevel(log.DebugLevel)
+	case "info":
+		log.SetLevel(log.InfoLevel)
+	default:
+		log.SetLevel(log.InfoLevel)
+	}
+
 	log.SetFormatter(&log.JSONFormatter{})
 
 	dbURL := os.Getenv("MONGODB_URI")

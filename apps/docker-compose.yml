@@ -1,7 +1,7 @@
 version: '2'
 services:
   hub:
-    image: "hub:0.0.3"
+    image: "hub:1.0.0"
     ports: 
       - "3000:3000"
     environment:
@@ -13,10 +13,14 @@ services:
       - knowledge
       - database
   knowledge:
-    image: "knowledge:0.0.9"
+    image: "knowledge:1.0.0"
+    ports:
+      - "8000:8000"
     environment:
       - MONGODB_URI=mongodb://database:27017
     depends_on:
       - database
   database:
-    image: "mongo:3.6"
+    image: "mongo:3.2"
+    volumes:
+      - '~/data/knowledge/3.2:/data/db'
