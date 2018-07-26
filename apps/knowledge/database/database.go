@@ -32,6 +32,7 @@ type MongoDB struct {
 // Create takes a record and writes it to the Mongo database
 func (db *MongoDB) Create(r types.Record) (string, error) {
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return "", err
 	}
@@ -80,6 +81,7 @@ func (db *MongoDB) Search(query types.SearchQuery) ([]types.Record, error) {
 		"maxLng": query.MaxLng,
 	}).Debug("Searching DB")
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +94,7 @@ func (db *MongoDB) Search(query types.SearchQuery) ([]types.Record, error) {
 	}).Debug("Checking for bounds")
 
 	if boundsPresent(query) {
-		err = c.Find(bson.M{
+		err = c.Find(bson.M{"$and": []interface{}{bson.M{
 			"location.coordinates": bson.M{
 				"$geoWithin": bson.M{
 					"$box": []interface{}{
@@ -101,7 +103,7 @@ func (db *MongoDB) Search(query types.SearchQuery) ([]types.Record, error) {
 					},
 				},
 			},
-		}).All(&records)
+		}, bson.M{"deleted": bson.M{"$ne": true}}}}).All(&records)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -128,6 +130,7 @@ func (db *MongoDB) Update(id string, r types.Record) error {
 	r.Location.Coordinates = []float64{r.Location.Lng, r.Location.Lat}
 
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return err
 	}
@@ -148,12 +151,34 @@ func (db *MongoDB) Update(id string, r types.Record) error {
 
 // Delete marks the matching record in the database as deleted
 func (db *MongoDB) Delete(id string) error {
+
+	log.WithFields(log.Fields{
+		"recordID": id,
+	}).Debug("Marking record as deleted.")
+
+	session, err := GetSession(db.URL)
+	defer session.Close()
+	if err != nil {
+		return err
+	}
+
+	c := session.DB("").C(db.Collection)
+
+	err = c.Update(bson.M{"id": id}, bson.M{"$set": bson.M{"deleted": true}})
+	if err != nil {
+		log.WithFields(log.Fields{
+			"id":    id,
+			"error": err.Error(),
+		}).Error("Failed to mark as deleted in database.")
+		return err
+	}
 	return nil
 }
 
 // Fields retrieves all the set fields that can be use for entering information
 func (db *MongoDB) Fields() ([]types.Field, error) {
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -176,6 +201,7 @@ func (db *MongoDB) Fields() ([]types.Field, error) {
 // UpdateFields writes the fields objects to the database, updating any that already exist.
 func (db *MongoDB) UpdateFields(fields []types.Field) error {
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return err
 	}
@@ -203,6 +229,7 @@ func (db *MongoDB) UpdateFields(fields []types.Field) error {
 func (db *MongoDB) DeleteField(id string) error {
 
 	session, err := GetSession(db.URL)
+	defer session.Close()
 	if err != nil {
 		return err
 	}

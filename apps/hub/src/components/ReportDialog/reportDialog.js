@@ -106,8 +106,8 @@ export class ReportDialog extends React.Component {
       const lat = formatLatitude(report.location.lat, { degrees: true });
       const lng = formatLongitude(report.location.lng, { degrees: true });
       const facilities = this.state.report ? this.state.report.facilities : [];
-      const chips = facilities && facilities.length > 0 ? facilities.map(facility => <FacilityChip key={facility} name={facility} onClick={() => this.removeFacility(facility)} />) : ""
-
+      const chips = facilities && facilities.length > 0 ? facilities.map(facility => <FacilityChip key={facility} name={facility} onClick={() => this.removeFacility(facility)} />) : "";     
+      
       return <DialogContainer visible={report !== null}
         id="locationDialog"
         className="locationDialog"
@@ -118,7 +118,11 @@ export class ReportDialog extends React.Component {
           colored
           title="Location details"
           nav={<Button icon onClick={() => this.props.onHide(null)}>close</Button>}
-          actions={<Button flat onClick={() => this.props.onHide(report)} disabled={this.state.shortNameError}>Save</Button>}
+          actions={[
+            
+            <Button flat onClick={() => { if (window.confirm('Are you sure you want to delete this record?')) this.props.onDelete(report) }} disabled={!report || !report.id}>Delete</Button>,
+            <Button flat onClick={() => this.props.onHide(report)} disabled={this.state.shortNameError}>Save</Button>
+          ]}
         />
         <Paper className="fillParent md-toolbar-relative" zDepth={1}>
           <SelectionControl

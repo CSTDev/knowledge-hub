@@ -38,3 +38,7 @@
 .country, .description, .facilities{
     width: 95%;
 }
+
+.md-toolbar--action-right {
+    display: flex !important;
+}

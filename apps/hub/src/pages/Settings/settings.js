@@ -31,7 +31,7 @@ class Settings extends Component {
         super(props);
 
         this.state = {
-            version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
+            version: window.APP_CONFIG.VERSION ? window.APP_CONFIG.VERSION : "0.0.1",
             items: [],
             disableEdit: false
         };

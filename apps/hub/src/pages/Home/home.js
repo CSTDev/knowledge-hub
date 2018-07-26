@@ -10,7 +10,7 @@ import { ReportDialog } from "../../components/ReportDialog/reportDialog";
 import { MapView } from '../../components/Map/map';
 import { VersionBar } from '../../components/VersionBar/versionBar';
 import { FilterOptions } from '../../components/FilterOptions/filterOptions';
-import { CreateRecord, GetRecords, LoadFields, UpdateRecord } from '../../data/api'
+import { CreateRecord, DeleteRecord, GetRecords, LoadFields, UpdateRecord } from '../../data/api'
 import { ToastContainer, toast } from 'react-toastify';
 import '../../react-toastify.css';
 import MenuBar from '../../components/MenuBar/menuBar';
@@ -32,9 +32,9 @@ class Home extends Component {
         "locations": true,
       },
       selectedReport: null,
-      version: process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION : "0.0.1",
-      versionColor: process.env.REACT_APP_VERSION_COLOUR ? process.env.REACT_APP_VERSION_COLOUR : "#58af58",
-      mapProvider: process.env.REACT_APP_MAP_PROVIDER ? process.env.REACT_APP_MAP_PROVIDER : "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
+      version: window.APP_CONFIG.VERSION ? window.APP_CONFIG.VERSION : "0.0.1",
+      versionColor: window.APP_CONFIG.VERSION_COLOUR ? window.APP_CONFIG.VERSION_COLOUR : "#58af58",
+      mapProvider: window.APP_CONFIG.MAP_PROVIDER ? window.APP_CONFIG.MAP_PROVIDER : "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
       fields: [],
       centre: {
         "lat": 0,
@@ -116,24 +116,50 @@ class Home extends Component {
   }
 
   getRecords = (bounds) => {
-      let records = GetRecords(bounds).then(response => {
-        if (!response || (response.status !== 200)) {
-          if (response.message && response.message == "404") {
-            this.setState({ reports: [], filteredReports: [] });
-            return
-          }
-          toast("Failed to load records");
+    let records = GetRecords(bounds).then(response => {
+      if (!response || (response.status !== 200)) {
+        if (response.message && response.message == "404") {
+          this.setState({ reports: [], filteredReports: [] });
+          return
+        }
+        toast("Failed to load records");
+        return;
+      }
+      response.json().then(json => {
+        return json;
+      }).then(records => {
+        this.setState({ reports: records });
+
+        this.filterChange(this.state.filterText)
+
+      });
+    });
+  }
+
+  deleteRecord = (record) => {
+    if (record.id) {
+      DeleteRecord(record.id).then((response) => {
+        if (!response || response.status !== 200) {
+          toast("Failed to Delete");
           return;
         }
-        response.json().then(json => {
-          return json;
-        }).then(records => {
-          this.setState({ reports: records });
 
-          this.filterChange(this.state.filterText)
+        
+        let newReports = [...this.state.filteredReports];
+        const index = newReports.indexOf(record)
+        if (index > -1){
+          newReports.splice(index, 1);
+        }
 
+        toast("Deleted")
+
+        this.setState({
+          selectedReport: null,
+          reports: newReports,
+          filteredReports: FilterData(newReports,this.state.filterText, this.state.filterOptions),
         });
       });
+    }
   }
 
   showReport = (report) => {
@@ -150,8 +176,8 @@ class Home extends Component {
       if (!reportToSave.id) {
         CreateRecord(reportToSave).then((response) => {
           if (!response || response.status !== 201) {
-            toast("Failed to Save")
-            return
+            toast("Failed to Save");
+            return;
           }
           response.json().then(json => {
             return json.ID
@@ -194,7 +220,7 @@ class Home extends Component {
     return (
       <div>
         <ToastContainer />
-        <VersionBar version={this.state.version} versionColor={this.state.versionColor}/>
+        <VersionBar version={this.state.version} versionColor={this.state.versionColor} />
         <MenuBar resetMap={this.resetMap} />
         <div className="mapArea">
           <div className="search-area" style={{ display: this.state.selectedReport ? "none" : "flex" }}>
@@ -208,7 +234,7 @@ class Home extends Component {
         <div className="detailsArea">
           <DetailsPane reports={this.state.filteredReports} showReport={this.showReport} filterTerm={this.state.filterText} viewButtonAction={this.zoomToLocation} />
         </div>
-        <ReportDialog report={this.state.selectedReport} onHide={this.hideReport} fields={this.state.fields} showFields={this.state.selectedReport ? !this.state.selectedReport.id : false} />
+        <ReportDialog report={this.state.selectedReport} onHide={this.hideReport} onDelete={this.deleteRecord} fields={this.state.fields} showFields={this.state.selectedReport ? !this.state.selectedReport.id : false} />
 
       </div>
     );

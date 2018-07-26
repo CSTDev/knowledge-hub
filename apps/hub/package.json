@@ -22,9 +22,15 @@
     "uuid": "^3.2.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "run-p  start-config start-app",
+    "start-config": "dev-config-server",
+    "start-app": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.3",
+    "@staticdeploy/app-server": "^2.1.0"
   }
 }
