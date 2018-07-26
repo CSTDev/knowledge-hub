@@ -45,6 +45,20 @@ export function UpdateRecord(record){
     })
 }
 
+export function DeleteRecord(id){
+    return fetch(window.APP_CONFIG.API_URL + '/record/' + id, {
+        method: 'DELETE',
+        headers: {'Content-Type':'application/json'},
+    }).then(response => {
+        if(!response.ok){
+            throw Error(response.statusText)
+        }
+        return response
+    }).catch(function(){
+        return null;
+    })
+}
+
 export function LoadFields(){
     return fetch(window.APP_CONFIG.API_URL + '/field', {
         method: 'GET'

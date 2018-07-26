@@ -11,4 +11,4 @@ Dep ensure wants to have its path as $GOPATH/src/{project} so need to create a s
 ### Run
 Set the following environment variables:
 PORT
-MONGODB_URI
+MONGODB_URI - in the format mongo://<user>:<pass/token>@<server>
