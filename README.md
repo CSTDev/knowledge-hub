@@ -1,6 +1,8 @@
 # Knowledge Hub
 A place to store all your information about a location and plot it on a map. Search over your information and get an overview as well as the details.
 
+![New Location](./screenshots/overview.png) ![Home Page](./screenshots/new.png) 
+
 ### Structure
 apps
  - hub (the web app)
@@ -9,8 +11,8 @@ apps
 
 ### Setup
 1. Load both knowledge and hub images, and ensure a mongo one is available.
-2. Deploy Mongo - version 3.2 and 3.6 work, don't know about others
-    Note the MONGO connection URL in the format mongo://<user>:<pass/token>@<host>:<port>/<database>, user and pass are optional
+2. Deploy Mongo - tested with version 3.2 and 3.6 work
+    Note the MONGO connection URL in the format mongo://\<user>:<pass/token>@\<host>:\<port>/\<database>, user and pass are optional
 3. Deploy API - 
     Set the following environment variables:
         MONGODB_URI - URL of the mongo DB noted above
@@ -27,11 +29,11 @@ apps
     Then start the container, it must be able to connect to the API.
 
 Alternatively:
-1. Load the images if they're not alread there.
+1. Build the images in each of the app directories.
 ```
-    docker load -i <tar file of image>
+    docker build -t <app name>:<version> .
 ```
-2. Start using docker compose
+2. Within the apps directory, start using docker compose
 ```
-    docker-compose up -d
+    docker-compose up
 ```
