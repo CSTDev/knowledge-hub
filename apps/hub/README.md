@@ -15,12 +15,13 @@ Then run:<br/>
 ```
 
 ## Build
+### Local
 For a production build run: <br/>
 ```
   npm run build
 ```
 
-#### Docker
+### Docker
 Alternatively it can be built into a docker image:
 ```
   docker build -t <tag> .

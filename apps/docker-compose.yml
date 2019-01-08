@@ -22,5 +22,3 @@ services:
       - database
   database:
     image: "mongo:3.2"
-    volumes:
-      - '~/data/knowledge/3.2:/data/db'
