@@ -3,16 +3,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/cstdev/knowledge-hub"
-  packages = [
-    "apps/knowledge/database",
-    "apps/knowledge/knowledge",
-    "apps/knowledge/types"
-  ]
-  revision = "269ceb3a6cf60af77807944e1f0baf4917d5060e"
-
-[[projects]]
-  branch = "master"
   name = "github.com/dyninc/qstring"
   packages = ["."]
   revision = "ab5840a88e818d51076cb7e9708e7cb7ff125a27"
@@ -71,6 +61,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1ba0bb1f048aba328cfd6c0221217bea5947f6b903459aa9f1d15598024bb674"
+  inputs-digest = "0fec3625953b475b39aefd20f61a2aee2ae1ed8c4e609854c6b151d0e930fa57"
   solver-name = "gps-cdcl"
   solver-version = 1
