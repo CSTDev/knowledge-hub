@@ -1,5 +1,7 @@
 module github.com/cstdev/knowledge-hub/apps/knowledge
 
+// +heroku install ./... 
+
 require (
 	github.com/dyninc/qstring v0.0.0-20160719172318-ab5840a88e81
 	github.com/globalsign/mgo v0.0.0-20180424091348-efe0945164a7
